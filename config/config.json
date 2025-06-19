@@ -1,0 +1,73 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "sharepoint-template-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/sharepointTemplate/SharepointTemplateWebPart.js",
+          "manifest": "./src/webparts/sharepointTemplate/SharepointTemplateWebPart.manifest.json"
+        }
+      ]
+    },
+    "custome-page-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/customePage/CustomePageWebPart.js",
+          "manifest": "./src/webparts/customePage/CustomePageWebPart.manifest.json"
+        }
+      ]
+    },
+    "contact-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/contact/ContactWebPart.js",
+          "manifest": "./src/webparts/contact/ContactWebPart.manifest.json"
+        }
+      ]
+    },
+    "onboarding-resources-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/onboardingResources/OnboardingResourcesWebPart.js",
+          "manifest": "./src/webparts/onboardingResources/OnboardingResourcesWebPart.manifest.json"
+        }
+      ]
+    },
+    "share-point-directory-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/sharePointDirectory/SharePointDirectoryWebPart.js",
+          "manifest": "./src/webparts/sharePointDirectory/SharePointDirectoryWebPart.manifest.json"
+        }
+      ]
+    },
+    "microsoft-teams-group-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/microsoftTeamsGroup/MicrosoftTeamsGroupWebPart.js",
+          "manifest": "./src/webparts/microsoftTeamsGroup/MicrosoftTeamsGroupWebPart.manifest.json"
+        }
+      ]
+    },
+    "project-details-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/projectDetails/ProjectDetailsWebPart.js",
+          "manifest": "./src/webparts/projectDetails/ProjectDetailsWebPart.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "SharepointTemplateWebPartStrings": "lib/webparts/sharepointTemplate/loc/{locale}.js",
+    "CustomePageWebPartStrings": "lib/webparts/customePage/loc/{locale}.js",
+    "ContactWebPartStrings": "lib/webparts/contact/loc/{locale}.js",
+    "OnboardingResourcesWebPartStrings": "lib/webparts/onboardingResources/loc/{locale}.js",
+    "SharePointDirectoryWebPartStrings": "lib/webparts/sharePointDirectory/loc/{locale}.js",
+    "MicrosoftTeamsGroupWebPartStrings": "lib/webparts/microsoftTeamsGroup/loc/{locale}.js",
+    "ControlStrings": "node_modules/@pnp/spfx-controls-react/lib/loc/{locale}.js",
+    "ProjectDetailsWebPartStrings": "lib/webparts/projectDetails/loc/{locale}.js"
+  }
+}

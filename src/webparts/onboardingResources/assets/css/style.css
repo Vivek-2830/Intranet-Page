@@ -1,0 +1,63 @@
+.Onboarding h2{
+    color: black;
+    font-size: 28px;
+    font-weight: 800;
+    margin-left: 42px;
+    margin-top: -22px;
+}
+
+.Onboarding-Text {
+    display: flex;
+    gap: 43px;
+    padding: 57px;
+    margin-top: -32px;
+}
+
+.Resources-Items {
+    width: 31%;
+    cursor: pointer;
+    transition: transform .3s;
+}
+
+.Resources-Items img {
+    border-radius: 20px;
+    width: 103%;
+    height: 62%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, .1);
+}
+
+.Resources-Items p {
+    padding: 10px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #333;
+}
+
+.Resources-Items:hover {
+    transform: translateY(-5px) translateX(2px);;
+}
+
+.footer {
+    width: 1501px;
+    display: flex;
+    align-items: center;
+    background-color: #000;
+    color: #fff;
+    padding: 10px;
+    margin-left: -32px;
+    margin-top: -39px;
+}
+
+.footer-text {
+    font-size: 14px;
+    margin-right: 765px;
+    padding: 5px 20px;
+    letter-spacing: 1px;
+}
+
+.contact-text {
+    font-size: 16px;
+    letter-spacing: 1px;
+}

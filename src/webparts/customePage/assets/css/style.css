@@ -1,0 +1,271 @@
+.Virtual-board h2 {
+    margin-left: 42px;
+    font-size: 28px;
+    font-weight: 800;
+    color: black;
+    margin-bottom: -21px;
+}
+
+.Roadmap-Resource {
+    display: flex;
+    padding: 70px 88px 10px 19px;
+    gap: 40px;
+}
+
+.Step1-Resource {
+    text-align: center;
+    position: relative;
+}
+
+.Steps-1 h3 {
+    font-size: 16px;
+    margin: 5px 0;
+}
+
+.Steps-1 p {
+    font-size: 15px;
+    color: #555;
+}
+
+.Steps1-Icons {
+    width: 75px;
+    height: 75px;
+    background-color: #59f7f4;
+    color: #CBF6F5;
+    border-radius: 60%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 10px auto;
+    font-size: 33px;
+}
+
+.Step2-Resource {
+    margin-right: 14px;
+    text-align: center;
+    position: relative;
+}
+
+.Steps-2 h3 {
+    font-size: 16px;
+    margin: 5px 0;
+}
+
+.Steps-2 p {
+    font-size: 15px;
+    color: #555;
+}
+
+.Steps2-Icons {
+    width: 75px;
+    height: 75px;
+    background-color: #3EDBD9;
+    color: #fff;
+    border-radius: 60%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 10px auto;
+    font-size: 33px;
+}
+
+.Step3-Resource {
+    margin-right: 40px;
+    text-align: center;
+    position: relative;
+}
+
+.Steps-3 h3 {
+    font-size: 16px;
+    margin: 5px 0;
+}
+
+.Steps-3 p {
+    font-size: 15px;
+    color: #555;
+}
+
+.Steps3-Icons {
+    width: 75px;
+    height: 75px;
+    background-color: #36C9EF;
+    color: #FCFEFF;
+    border-radius: 60%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 10px auto;
+    font-size: 33px;
+}
+
+.Step4-Resource {
+    margin-right: 41px;
+    text-align: center;
+    position: relative;
+}
+
+.Steps-4 h3 {
+    font-size: 16px;
+    margin: 5px 13px;
+}
+
+.Steps-4 p {
+    margin-left: 9px;
+    font-size: 15px;
+    color: #555;
+}
+
+.Steps4-Icons {
+    width: 75px;
+    height: 75px;
+    background-color: #36C9EF;
+    color: #fff;
+    border-radius: 60%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 10px auto;
+    font-size: 33px;
+}
+
+.Step5-Resource {
+    text-align: center;
+    position: relative;
+}
+
+.Steps-5 h3 {
+    font-size: 16px;
+    margin: 5px 0;
+}
+
+.Steps-5 p {
+    font-size: 15px;
+    color: #555;
+}
+
+.Steps5-Icons {
+    width: 75px;
+    height: 75px;
+    background-color: #2C93D5;
+    color: #fff;
+    border-radius: 60%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 10px auto;
+    font-size: 33px;
+}
+
+.Step1-line {
+    position: absolute;
+    top: 77%;
+    left: 117%;
+    transform: translate(-40%, -50%);
+    width: 92%;
+    height: 4px;
+    background-color: #59f7f4;
+}
+
+.Step2-line {
+    position: absolute;
+    top: 77%;
+    left: 117%;
+    transform: translate(-44%, -50%);
+    width: 92%;
+    height: 4px;
+    background-color: #3EDBD9;
+}
+
+.Step3-line {
+    position: absolute;
+    top: 80%;
+    left: 111%;
+    transform: translate(-32%, -154%);
+    width: 103%;
+    height: 4px;
+    background-color: #36c9ef;
+}
+
+.Step4-line {
+    position: absolute;
+    top: 77%;
+    left: 117%;
+    transform: translate(-30%, -50%);
+    width: 139%;
+    height: 4px;
+    background-color: #36c9ef;
+}
+
+.Step5-line {
+    position: absolute;
+    top: 77%;
+    left: 117%;
+    transform: translate(-36%, -50%);
+    width: 80%;
+    height: 4px;
+    background-color: #2C93D5;
+}
+
+.Play-Arrow {
+    position: absolute;
+    position: absolute;
+    font-size: 27px;
+    top: 68%;
+    right: -45px;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+}
+  
+.step:last-child .arrow {
+    display: none;
+}
+
+.Arrow-Img {
+    width: 29px;
+    height: 29px;
+    position: absolute;
+    top: 77%;
+    right: -64px;
+    transform: translateY(-50%);
+}
+
+.question h3{
+    padding: 15px 27px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #7abfed;
+    color: black;
+    width: 69%;
+    font-weight: 600;
+    border: none;
+    transition: background-color .3s ease;
+    border-radius: 31px;
+    margin-top: 34px;
+    margin-left: 78px;
+}
+
+.Questions {
+    margin: -17px;
+}
+
+.Answer-Item {
+    margin-top: 5px;
+    width: 71%;
+    background-color: #a6cce5;
+    padding: 5px 0px 5px 7px;
+    font-size: 15px;
+    border-radius: 30px 30px 30px 30px;
+    margin-left: 100px;
+}
+
+.arrow-down{
+    cursor: pointer;
+    font-size: 24px;
+    margin-right: -11px;
+}
+
+.Question-Ans {
+    margin-top: 90px;
+}

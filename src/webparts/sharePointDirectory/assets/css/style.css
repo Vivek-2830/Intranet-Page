@@ -1,0 +1,27 @@
+.Add-Directoy {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.Add-Form {
+    display: flex;
+    margin-top: 20px;
+    gap: 8px;
+}
+
+.Add-Form .ms-Button--primary {
+    border-radius: 5px;
+}
+
+.Add-Form-Cancel .ms-Button--default {
+    border-radius: 5px;
+}
+
+.Add-Dialog .ms-Dialog-title {
+    text-align: left;
+}
+
+.Add-Dialog .ms-Dialog-main {
+    border-radius: 14px;
+}

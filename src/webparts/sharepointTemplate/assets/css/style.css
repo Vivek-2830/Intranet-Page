@@ -1,0 +1,122 @@
+[data-sp-feature-tag="PageTitle web part (Banner)"] {
+    display: none;
+}
+
+[data-automation-id="CanvasZone-SectionContainer"] {
+    max-width: 150% !important;
+}
+
+[data-automation-id="sp-appBar"] {
+    display: none;
+}
+
+/* .spAppAndPropertyPanelContainer .sp-appBar {
+    background: #F0F0F0;
+    display: block;
+    min-width: 47px;
+    display: none;
+} */
+
+#sp-appBar {
+    display: none;
+}
+
+#spCommandBar {
+    display: none;
+}
+
+/* .isFluent .SPPageChrome-app .commandBarWrapper {
+    border-bottom: 1px solid;
+    border-color: #edebe9;
+    display: none;
+} */
+
+.line-clamp {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;  
+    overflow: hidden;
+}
+
+.welcome-text {
+    margin-top: -21px;
+    width: 1566px;
+    display: flex;
+    justify-content: space-between;
+    background-color: #3582c4;
+    color: #fff;
+    padding: 11px;
+    margin-left: -100px;
+}
+
+.Header-Text h1 {
+    font-size: 3em;
+    font-family: Arial, sans-serif;
+    font-weight: 700;
+    margin-bottom: 10px;
+    margin-left: 101px;
+    margin-top: 70px;
+}
+
+.Header-Text p {
+    font-size: 1.2em;
+    line-height: 1.5;
+    margin-bottom: 10px;
+    margin-left: 101px;
+}
+
+.Step-Image img{
+    object-fit: cover;
+    margin: 11px;
+    height: 392px;
+    width: 100%;
+    display: flex;
+    border-top-left-radius: 196px;
+    border-bottom-left-radius: 196px;
+    margin-top: -11px;
+    margin-bottom: -11px;
+}
+
+.Step-Image{
+    flex-basis: 50%;
+}
+
+.Step-Icons{
+    display: flex;
+    justify-content: center;
+    margin-top: 60px;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.All-Icons{
+    height: 101px;
+    background-color: white;
+    color: #3582c4;
+    padding: 10px;
+    border-radius: 8px;
+    transition: background-color .3s ease;
+    flex-basis: 8%;
+    text-align: center;
+    border: 6px solid #ddd;
+    border-radius: 20px;
+    /* box-shadow: 0 2px 5px rgba(0, 0, 0, .1); */
+    box-shadow: rgba(0, 0, 0, 0.11) 0px 0.3px 0.9px, rgba(0, 0, 0, 0.11) 0px 1.6px 3.6px;
+}
+
+.All-Icons:hover {
+    /* box-shadow: 0 1rem 0rem -1rem black; */
+    box-shadow: rgb(200, 200, 200) 0px 1.2px 3.6px, rgb(200, 200, 200) 0px 6.4px 14.4px !important;
+    /* box-shadow: rgba(0, 0, 0, 0.133) 0px 6.4px 14.4px 0px, rgba(0, 0, 0, 0.11) 0px 1.2px 3.6px 0px*/
+}
+
+.All-Icons .Items-Icon{
+    font-size: 42px;
+    margin-top: 16px;
+}
+
+.All-Icons p{
+    color:  black;
+    font-size: 20px;
+    margin: 7px;
+}

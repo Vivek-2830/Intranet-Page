@@ -1,0 +1,128 @@
+.Contact-Text h2{
+    font-size: 28px;
+    font-weight: 800;
+    color: black;
+    margin-left: 30px;
+}
+
+.Contacts {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    margin-left: 30px;
+}
+
+.Contact-Image img{
+    width: 60px;
+    height: 60px;
+    border-radius: 50px;
+    border: 1px solid #ddd;
+}
+
+.Contact-Details {
+    font-weight: 800;
+    margin: 8px;
+    margin-top: 0px;
+    font-size: 17px;
+}
+
+.Contact-Details h4{
+    margin: 3px;
+}
+
+.Contact-Details p{
+    font-weight: 400;
+    font-size: 15px;
+    /* color: #9090af; */
+    margin: 3px;
+}
+
+.FAQ-Question img{
+    margin-top: 60px;
+    width: 93%;
+    height: 93%;
+    border-radius: 10px;
+    margin-left: 27px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, .1);
+}
+
+.FAQ-Question h2{
+    margin-top: 20px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 20px;
+    margin-bottom: 22px;
+}
+
+.Submit-Question .ms-Button--primary {
+    border: none;
+    border-radius: 4px;
+    margin-top: 16px;
+    background-color: #3582c4;
+}
+
+.Submit-Question .ms-Button--primary:hover {
+    background-color: #3582c4;
+}
+
+.Add-Dialog .ms-Dialog-title{
+    color: #fafafa;
+    font-weight: 600;
+    background-color: #3582c4;
+    padding: 25px 0px 25px 0px;
+    font-size: 28px;
+    line-height: normal;
+    min-height: 15px;
+    margin-bottom: 39px;
+    text-align: center;
+}
+
+.Add-Dialog .ms-Dialog-main {
+    border-radius: 14px;
+}
+
+.line {
+    width: 281px;
+}
+
+.More-Contact {
+    margin-left: 200px;
+    cursor: pointer;
+}
+
+.Contact-Dialog .ms-Dialog-main{
+    border-radius: 14px;
+    background: #ededed;
+}
+
+.Contacts-Two {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.ContactTwo-Image img{
+    width: 60px;
+    height: 60px;
+    border-radius: 50px;
+    border: 1px solid #ddd;
+}
+
+.ContactTwo-Details {
+    font-weight: 800;
+    margin: 8px;
+    margin-top: 0px;
+    font-size: 17px;
+}
+
+.ContactTwo-Details h4{
+    margin: 3px;
+    color: black;
+}
+
+.ContactTwo-Details p{
+    font-weight: 500;
+    font-size: 15px;
+    /* color: #9090af; */
+    margin: 3px;
+}
