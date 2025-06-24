@@ -11,7 +11,16 @@ import { IIconProps } from 'office-ui-fabric-react';
 
 
 export interface IProjectDetailsState {
-
+  ProjectDetails : any;
+  ProjectName : any;
+  ProjectDescription : any;
+  ProjectStartDate : any;
+  ProjectEndDate : any;
+  ProjectStatus : any;
+  ProjectManager : any;
+  AssignedTo : any;
+  Attachments : any;
+  ProjectDetailsAddOpenDialog : boolean;
 }
 
 const addIcon: IIconProps = { iconName: 'Add' };
@@ -66,6 +75,16 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
     super(props);
 
     this.state = {
+      ProjectDetails : "",
+      ProjectName : "",
+      ProjectDescription : "",
+      ProjectStartDate : "",
+      ProjectEndDate : "",
+      ProjectStatus : [],
+      ProjectManager : "",
+      AssignedTo : "",
+      Attachments : "",
+      ProjectDetailsAddOpenDialog : true
     };
 
   }
@@ -81,12 +100,13 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
 
     return (
       <section id="projectDetails">
-        
+        <h3>Project Details</h3>
       </section>
     );
   }
 
   public async componenetDidMount() {
+    this.GetProjectDetails();
   }
 
   public async GetProjectDetails() {
@@ -102,6 +122,49 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
       "AssignedTo/Id",
       "AssignedTo/Title",
       "Attachments"
-    )
+    ).expand("AssignedTo","ProjectManager").get().then((data) => {
+      let AllData = [];
+      console.log(data);
+      console.log(projectdetails);
+
+      if(data.length > 0) {
+        data.forEach((item) => {
+          AllData.push({
+            ID : item.Id ? item.Id : "",
+            ProjectName : item.ProjectName ? item.ProjectName : "",
+            ProjectDescription : item.ProjectDescription ? item.ProjectDescription : "",
+            ProjectStartDate : item.ProjectStartDate ? item.ProjectStartDate : "",
+            ProjectEndDate : item.ProjectEndDate ? item.ProjectEndDate : "",
+            ProjectStatus : item.ProjectStatus ? item.ProjectStatus : "",
+            ProjectManager : item.ProjectManager ? item.ProjectManager.Title : "",
+            AssignedTo : item.AssignedTo ? item.AssignedTo.Title : "",
+            Attachments : item.Attachments ? item.Attachments : ""
+          });
+        });
+        this.setState({ ProjectDetails : AllData });
+        console.log(this.state.ProjectDetails);
+      }
+    }).catch((error) => {
+      console.log("Error fetching project details: ", error);
+    });
+  }
+
+
+  public async AddProjectDetails() {
+    if(this.state.ProjectName.length == 0) {
+      alert("Please enter Project Details");
+    }
+    else {
+      const addProjectdetails = await sp.web.lists.getByTitle("ProjectDetails").items.add({
+        ProjectName : this.state.ProjectName,
+        ProjectDescription : this.state.ProjectDescription,
+        ProjectStartDate : this.state.ProjectStartDate,
+        ProjectEndDate : this.state.ProjectEndDate,
+        ProjectStatus : this.state.ProjectStatus,
+        ProjectManager : this.state.ProjectManager,
+        AssignedTo : this.state.AssignedTo,
+        Attachments : this.state.Attachments
+      })
+    }
   }
 }
