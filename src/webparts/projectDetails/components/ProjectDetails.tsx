@@ -4,7 +4,7 @@ import { IProjectDetailsProps } from './IProjectDetailsProps';
 import { escape, update } from '@microsoft/sp-lodash-subset';
 import { sp } from '@pnp/sp';
 import { PeoplePicker, PrincipalType } from "@pnp/spfx-controls-react/lib/PeoplePicker";
-import { DatePicker, Dialog, IIconProps, PrimaryButton, SearchBox, TextField } from 'office-ui-fabric-react';
+import { DatePicker, Dialog, Dropdown, IIconProps, PrimaryButton, SearchBox, TextField } from 'office-ui-fabric-react';
 import { IItem, Item } from '@pnp/sp/items';
 import { Attachments } from '@pnp/sp/attachments';
 
@@ -18,6 +18,7 @@ export interface IProjectDetailsState {
   ProjectStartDate : any;
   ProjectEndDate : any;
   ProjectStatus : any;
+  ProjectStatuslist : any;
   ProjectManager : any;
   AssignedTo : any;
   Attachments : any;
@@ -84,6 +85,7 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
       ProjectStartDate : "",
       ProjectEndDate : "",
       ProjectStatus : [],
+      ProjectStatuslist : [],
       ProjectManager : "",
       AssignedTo : "",
       Attachments : "",
@@ -197,6 +199,32 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
               </div>
             </div>
 
+            <div className='ms-Grid-col ms-sm12 ms-md6 ms-lg6'>
+              <div className='Add-EndDate'> 
+                <DatePicker
+                  label='End Date'
+                  allowTextInput={false}
+                  value={this.state.ProjectEndDate ? this.state.ProjectEndDate : null}
+                  onSelectDate={(date: any) => this.setState({ ProjectEndDate : date })}
+                  aria-label="Select a Date" placeholder='Select a Project End Date' isRequired
+                />
+              </div>
+            </div>
+
+            <div className='ms-Grid-col ms-sm12 ms-md6 ms-lg6'>
+              <div className='Add-ProjectStatus'>
+                <Dropdown
+                  options={this.state.ProjectStatuslist}
+                  label="Project Status"
+                  required
+                  placeholder="Select Project Status"
+                  onChange={(e, option, text) =>
+                    this.setState({ ProjectStatus: option.key })
+                  }
+                />
+              </div>
+            </div>
+
           </div>
 
         </Dialog>
@@ -248,7 +276,6 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
       console.log("Error fetching project details: ", error);
     });
   }
-
 
   public async AddProjectDetails() {
     if(this.state.ProjectName.length == 0) {
@@ -369,4 +396,15 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
     });
     this.setState({ ProjectDetails : updated, RemoveAttachment : DeleteDocs });
   }
+
+  public async GetProjectStatusItem() {
+    const choiceFieldName1 = "ProjectStatus";
+    const field1 = await sp.web.lists.getByTitle("ProjectDetails").fields.getByInternalNameOrTitle(choiceFieldName1)();
+    let projectstatus = [];
+    field1["Choices"].forEach(function (dname, i) {
+      projectstatus.push({ key: dname, text: dname });
+    });
+    this.setState({ ProjectStatuslist: projectstatus });
+  } 
+
 }

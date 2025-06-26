@@ -1,0 +1,9 @@
+-- Project management in SharePoint --
+
+1). Create a dashboard in Task Details list.
+2). Create Task Form - CRUD Operation.
+3). Create New Project Form - Create Form. (Project-related documents can be attached to the project details section.)
+4). Project Dashboard - Completed Project & Pending Project.
+5). Create a Issue / Bug form ( add a Timeline to solve the issue for the project).
+6). Create a bar chart in Project Completed & Pending.
+7). Create a chart for task in ToDo , InProgress, Ready For QA, Completed.
