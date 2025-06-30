@@ -4,7 +4,7 @@ import { IProjectDetailsProps } from './IProjectDetailsProps';
 import { escape, update } from '@microsoft/sp-lodash-subset';
 import { sp } from '@pnp/sp';
 import { PeoplePicker, PrincipalType } from "@pnp/spfx-controls-react/lib/PeoplePicker";
-import { DatePicker, Dialog, Dropdown, IIconProps, PrimaryButton, SearchBox, TextField } from 'office-ui-fabric-react';
+import { DatePicker, Dialog, Dropdown, Icon, IIconProps, PrimaryButton, SearchBox, TextField } from 'office-ui-fabric-react';
 import { IItem, Item } from '@pnp/sp/items';
 import { Attachments } from '@pnp/sp/attachments';
 
@@ -21,6 +21,7 @@ export interface IProjectDetailsState {
   ProjectStatuslist : any;
   ProjectManager : any;
   AssignedTo : any;
+  AssignedToID : any;
   Attachments : any;
   ProjectDetailsAddOpenDialog : boolean;
   RemoveAttachment : any;
@@ -88,6 +89,7 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
       ProjectStatuslist : [],
       ProjectManager : "",
       AssignedTo : "",
+      AssignedToID : "",
       Attachments : "",
       ProjectDetailsAddOpenDialog : true,
       RemoveAttachment : [],
@@ -225,6 +227,91 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
               </div>
             </div>
 
+            <div className='ms-Grid-col ms-sm12 ms-md6 ms-lg6'>
+              <div className='Add-ProjectManager'>
+                <TextField
+                  label="Project Manager"
+                  type="text"
+                  required={true}
+                  onChange={(value) =>
+                    this.setState({ ProjectManager: value.target["value"] })
+                  }
+                />
+              </div>
+            </div>
+
+            <div className='ms-Grid-col ms-sm12 ms-md6 ms-lg6'>
+              <div className='Add-AssignedTo'>
+                <PeoplePicker
+                  context={this.props.context}
+                  titleText="Assigned To:"
+                  personSelectionLimit={1}
+                  placeholder='Select Assigned To'
+                  showtooltip={true}
+                  required={true}
+                  defaultSelectedUsers={[this.state.AssignedTo.Title]}
+                  onChange={(e) =>
+                    this.setState({ AssignedToID: e[0].id, AssignedTo: e[0].text })
+                  }
+                  principalTypes={[PrincipalType.User]}
+                  resolveDelay={300}
+                  ensureUser={true}                                            
+                />
+              </div>
+            </div>
+
+            <div className='ms-Grid-col ms-sm12 ms-md12 ms-lg12'>
+              <label className='Attachmentlabel' htmlFor="ProjectDocuments">
+                  Upload Document
+              </label>
+              <input
+                style={{ display: "none" }}
+                type="file"
+                id="ProjectDocuments"
+                multiple
+                onChange={(e) => this.UploadAttachments(e.target.files,this.state.Attachments.Id,this.state.Attachments.Title)}
+              >
+              </input>
+              {
+                this.state.ProjectDetails.length > 0 && 
+                this.state.ProjectDetails.map((item) => (
+                  <div className='attachment-wrap' key={item.Id}>
+                    {item.Attachments && 
+                      item.Attachments.map((i) => (
+                        <div className='attachmentname' key={i.FileName}>
+                          <a
+                            className='link-file'
+                            href={'https://200oksolutions.sharepoint.com' + i.ServerRelativeUrl + "?web=1"}
+                            target="_blank"
+                            data-interception="off"
+                            >
+                            <p className='attachment-name'>{item.FileName}</p>
+                          </a>   
+                          <Icon
+                            iconName="Cancel"
+                            className='icon-cancel'
+                            onClick={() => this.RemoveAttachments(item.Id, i.FileName)} 
+                          />   
+                        </div>
+                      ))}
+                      {
+                        item.file &&
+                          item.file.map((i) => (
+                            <div className='filename' key={i.name}>
+                              <p className='file-name'>{i.name}</p>
+                              <Icon
+                                iconName='Cancel'
+                                className='icon-cancel'
+                                onClick={() => this.RemoveUploadedDoc(item.Id, i.name)} 
+                              />
+                            </div>
+                          ))
+                      }
+                  </div>
+                ))
+              }
+            </div>
+
           </div>
 
         </Dialog>
@@ -235,6 +322,7 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
 
   public async componenetDidMount() {
     this.GetProjectDetails();
+    this.GetProjectStatusItem();
   }
 
   public async GetProjectDetails() {
@@ -350,8 +438,20 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
         FileName : item.name,
         file : item,
         DocumentType : Title
-      })
-    })
+      });
+    });
+
+    const docTypeSet: Set<string> = new Set();
+    uploadeddoc.forEach(doc => {
+      if(doc.DocumentType) {
+        docTypeSet.add(doc.DocumentType);
+      }
+    });
+
+    const uniqueDocuments = [];
+    docTypeSet.forEach(type => uniqueDocuments.push(type));
+
+    this.setState({ UploadDocuments: uploadeddoc, ProjectDetails : updateProjectdetailsdoc });
   }
 
   public async RemoveUploadedDoc(id : number, file) {
@@ -405,6 +505,19 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
       projectstatus.push({ key: dname, text: dname });
     });
     this.setState({ ProjectStatuslist: projectstatus });
-  } 
+  }
+  
+  public _getPeoplePickerItems = async (items: any[]) => {
+    if (items.length > 0) {
+      const assigneto = items.map(item => item.text);
+      const assignetoID = items.map(item => item.id);
+      this.setState({ AssignedTo: assigneto });
+      this.setState({ AssignedToID: assignetoID });
+    }
+    else {
+      this.setState({ AssignedTo: [] });
+      this.setState({ AssignedToID: [] });
+    }
+  }
 
 }

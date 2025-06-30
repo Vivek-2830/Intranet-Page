@@ -448,7 +448,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
                                             required={true}
                                             defaultSelectedUsers={[this.state.AssignedTo.Title]}
                                             onChange={(e) =>
-                                              this.setState({ AssignedToID: e[0].id, AssignedTo: e[0].text })
+                                               this.setState({ AssignedToID: e[0].id, AssignedTo: e[0].text })
                                             }
                                             principalTypes={[PrincipalType.User]}
                                             resolveDelay={300}
