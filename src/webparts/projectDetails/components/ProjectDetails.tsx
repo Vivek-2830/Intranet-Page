@@ -6,7 +6,7 @@ import { sp } from '@pnp/sp';
 import { PeoplePicker, PrincipalType } from "@pnp/spfx-controls-react/lib/PeoplePicker";
 import { DatePicker, Dialog, Dropdown, Icon, IIconProps, PrimaryButton, SearchBox, TextField } from 'office-ui-fabric-react';
 import { IItem, Item } from '@pnp/sp/items';
-import { Attachments } from '@pnp/sp/attachments';
+import { Attachments, IAttachmentInfo } from '@pnp/sp/attachments';
 
 
 
@@ -26,6 +26,7 @@ export interface IProjectDetailsState {
   ProjectDetailsAddOpenDialog : boolean;
   RemoveAttachment : any;
   UploadDocuments : any;
+  ProjectDocuments : any;
 }
 
 const addIcon: IIconProps = { iconName: 'Add' };
@@ -93,7 +94,8 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
       Attachments : "",
       ProjectDetailsAddOpenDialog : true,
       RemoveAttachment : [],
-      UploadDocuments : []
+      UploadDocuments : [],
+      ProjectDocuments : []
     };
 
   }
@@ -261,21 +263,23 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
             </div>
 
             <div className='ms-Grid-col ms-sm12 ms-md12 ms-lg12'>
-              <label className='Attachmentlabel' htmlFor="ProjectDocuments">
-                  Upload Document
+              <label className='Attachmentlabel' htmlFor="Project Docs">
+                Upload Document
               </label>
               <input
-                style={{ display: "none" }}
-                type="file"
-                id="ProjectDocuments"
-                multiple
-                onChange={(e) => this.UploadAttachments(e.target.files,this.state.Attachments.Id,this.state.Attachments.Title)}
+                  style={{ display: "none" }}
+                  type="file"
+                  id="Project Docs"
+                  multiple
+                  onChange={(e) => this.UploadAttachments(e.target.files,this.state.Attachments,this.state.Attachments.Title)}
               >
               </input>
               {
                 this.state.ProjectDetails.length > 0 && 
                 this.state.ProjectDetails.map((item) => (
                   <div className='attachment-wrap' key={item.Id}>
+
+                   
                     {item.Attachments && 
                       item.Attachments.map((i) => (
                         <div className='attachmentname' key={i.FileName}>
@@ -344,7 +348,11 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
       console.log(projectdetails);
 
       if(data.length > 0) {
-        data.forEach((item) => {
+        data.forEach(async (item,i) => {
+
+          const item1: IItem = sp.web.lists.getByTitle("ProjectDetails").items.getById(item.Id); 
+          const info : IAttachmentInfo[] = await item1.attachmentFiles();
+
           AllData.push({
             ID : item.Id ? item.Id : "",
             ProjectName : item.ProjectName ? item.ProjectName : "",
@@ -354,10 +362,11 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
             ProjectStatus : item.ProjectStatus ? item.ProjectStatus : "",
             ProjectManager : item.ProjectManager ? item.ProjectManager.Title : "",
             AssignedTo : item.AssignedTo ? item.AssignedTo.Title : "",
-            Attachments : item.Attachments ? item.Attachments : ""
+            Attachments : info,
+            isfilechanged : false,
           });
         });
-        this.setState({ ProjectDetails : AllData });
+        this.setState({ ProjectDetails : AllData, ProjectDocuments : AllData });
         console.log(this.state.ProjectDetails);
       }
     }).catch((error) => {
@@ -414,7 +423,7 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
   }
 
   public async UploadAttachments(files, id: number, Title) {
-    const updateProjectdetailsdoc = this.state.ProjectDetails.map(item => {
+    const updateProjectdetailsdoc = this.state.ProjectDocuments.map(item => {
       if(item.Title === Title) {
         return {
           ...item,
@@ -427,14 +436,14 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
       }
     });
 
-    const filteredData = this.state.ProjectDetails.filter(item => item.Title === Title);
+    const filteredData = this.state.ProjectDocuments.filter(item => item.Title === Title);
 
     const uploadeddoc = this.state.UploadDocuments;
 
     const fileArray = [...files];
     fileArray.map(item => {
       uploadeddoc.push({ 
-        Id : filteredData[0].Id,
+        Id : uploadeddoc[0].Id,
         FileName : item.name,
         file : item,
         DocumentType : Title
@@ -451,13 +460,13 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
     const uniqueDocuments = [];
     docTypeSet.forEach(type => uniqueDocuments.push(type));
 
-    this.setState({ UploadDocuments: uploadeddoc, ProjectDetails : updateProjectdetailsdoc });
+    this.setState({ UploadDocuments: uploadeddoc, ProjectDocuments : updateProjectdetailsdoc });
   }
 
   public async RemoveUploadedDoc(id : number, file) {
     const fileToRemove = file;
 
-    const updateddetails = this.state.ProjectDetails.map(item => {
+    const updateddetails = this.state.ProjectDocuments.map(item => {
       if(item.Id === id) {
         const files = Array.isArray(item.file) ? item.file : [item.file];
         const updatedoc = files.filter(f => f.name !== fileToRemove);
@@ -472,11 +481,11 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
     const updatedoc = this.state.UploadDocuments;
     updatedoc.filter(f => f.FileName !== fileToRemove);
 
-    this.setState({ ProjectDetails : updateddetails, UploadDocuments : updatedoc });
+    this.setState({ ProjectDocuments : updateddetails, UploadDocuments : updatedoc });
   }
 
   public async RemoveAttachments(id: number, fileName: string) {
-    const updated = this.state.ProjectDetails.map(item => {
+    const updated = this.state.ProjectDocuments.map(item => {
       if(item.Id === id) {
         const updatedFiles = item.Attachments.filter(f => f.FileName !== fileName);
         return {
@@ -494,7 +503,7 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
       FileName: fileName,
       Id : id
     });
-    this.setState({ ProjectDetails : updated, RemoveAttachment : DeleteDocs });
+    this.setState({ ProjectDocuments : updated, RemoveAttachment : DeleteDocs });
   }
 
   public async GetProjectStatusItem() {
