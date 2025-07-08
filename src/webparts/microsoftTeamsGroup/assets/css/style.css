@@ -47,6 +47,35 @@
     color: black;
 }
 
+.TaskAction-Icon {
+    display: flex;
+    gap : 13px;
+    font-size: 19px;
+    cursor: pointer;
+}
+
+.Read-Icon .Read-task{
+    color: black;
+}
+
+.Edit-Icon {
+    color: green;
+}
+
+.Delete-Icon {
+    color: red;
+}
+
+.close-Icon {
+    color: #a8a8a8;
+    font-size: 17px;
+    cursor: pointer;
+    position: absolute;
+    top: 16px;
+    right: 1px;
+    transition: all .4s;
+}
+
 .Add-Tasks {
     display: flex;
     justify-content: flex-end;

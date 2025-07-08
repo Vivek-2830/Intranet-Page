@@ -1,0 +1,226 @@
+.Header-Title h3{
+    margin: 0px;
+    font-size: 20px;
+    font-weight: 600;
+    background-color: rgb(251 251 251);
+    border-left: 2px solid rgb(121, 89, 165);
+    padding: 4px 15px;
+    width: max-content;
+    margin-bottom: 30px;
+    color: rgb(121, 89, 165);
+}
+
+.new-search,.new-search:hover{
+    border: 1px solid rgb(121, 89, 165);
+    border-radius: 34px;
+    height: auto;
+    padding: 7px 8px;
+    /* margin: 10px 0 10px 0; */
+    animation: none !important;
+}
+.new-search::after{
+    border: 1px solid rgb(121, 89, 165);
+    border-radius: 34px;
+    height: auto;
+    padding: 7px 8px;
+}
+
+.ms-Viewport {
+    margin-top: 10px;
+    box-sizing: border-box;
+    border: 0 solid #e5e7eb;
+    border-radius: .75rem;
+    border-width: 1px;
+    --tw-shadow: 0 2px 3px 0 rgba(0, 0, 0, .1), 0 1px 2px -1px rgba(0, 0, 0, .1);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+    /* padding: 1rem; */
+    overflow: hidden;
+    line-height: 18px;
+}
+
+.ms-DetailsList  {
+    overflow: hidden;
+}
+
+.ms-DetailsRow {
+    font-size: 12px;
+    color: black;
+}
+
+.ProjectAction-Icon {
+    display: flex;
+    gap : 13px;
+    font-size: 19px;
+    cursor: pointer;
+}
+
+.Read-Icon .Read-project{
+    color: black;
+}
+
+.Edit-Icon {
+    color: green;
+}
+
+.Delete-Icon {
+    color: red;
+}
+
+.close-Icon {
+    color: #a8a8a8;
+    font-size: 17px;
+    cursor: pointer;
+    position: absolute;
+    top: 16px;
+    right: 1px;
+    transition: all .4s;
+}
+
+.Add-Projects {
+    display: flex;
+    justify-content: flex-end;
+    right: 15px;
+}
+
+.Add-ProjectDetails .ms-Button--primary{
+    text-align: end;
+    color: #fff;
+    border: 1px solid rgb(121, 89, 165);
+    border-radius: 5px;
+    background-color: rgb(121, 89, 165);
+}
+
+.Next {
+    display: flex;
+    justify-content: end;
+    margin-top: 20px;
+}
+
+.Add-Dialog .ms-Dialog-title {
+    text-align: left;
+    color: rgb(121, 89, 165);
+}
+
+.Add-Dialog .ms-Dialog-main {
+    border-radius: 14px;
+}
+
+.Delet-Dialog .ms-Dialog-main {
+    border-radius: 16px 16px 16px 16px;
+}
+
+.Delet-Dialog .ms-Dialog-title {
+    border: none;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    border-bottom: none;
+    padding: 20px 24px 20px;
+    background: linear-gradient(to right, #ff6b6b, #ff8787);
+    border-radius: 16px 16px 0 0;
+    color: white;
+}
+
+.Warinig-Ic {
+    font-size: 45px;
+    color: #ff6b6b;
+}
+
+.confirm-text {
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+.confirm-icon  {
+    filter: brightness(0) invert(1);
+    opacity: 0.8;
+    transition: opacity 0.2s;
+    color: #a8a8a8;
+    font-size: 17px;
+    cursor: pointer;
+    position: absolute;
+    top: -41px;
+    right: -6px;
+}
+
+.confirm-icon:hover{
+    opacity: 1;
+}
+
+.delete-msg {
+    padding: 22px 55px;
+    font-size: 16px;
+    color: #495057;
+    text-align: center;
+}
+
+.Delet-buttons {
+    display: flex;
+    border-top: none;
+    justify-content: end;
+    gap: 11px;
+}
+
+.cancel-Icon {
+    border-radius: 10px;
+    font-weight: 500;
+    transition: all .2s;
+    background-color: #e9ecef;
+    border: none;
+    color: #495057
+}
+
+.cancel-Icon:hover{
+    background-color: #dee2e6;
+}
+
+.delete-icon {
+    border-radius: 10px;
+    background: linear-gradient(to right, #ff6b6b, #ff8787);
+    border: none;
+}
+
+.delete-icon:hover{
+    background: linear-gradient(to right, #fa5252, #ff6b6b);
+    transform: translateY(-1px);
+    border: none;
+}
+
+.mb-0{color: black;}
+
+.Project-Submit {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    gap: 10px;
+
+}
+
+.Attachmentlabel {
+    cursor: pointer;
+    padding: 2px 7px 2px 7px;
+    border-radius: 8px;
+    color: rgb(121, 89, 165);
+    background-color: #e2723800;
+    border: 1px solid rgb(121, 89, 165);
+    margin-bottom: 7px;
+    display: block;
+    width: max-content;
+}
+
+.Attachment-wrap {
+    flex-wrap: wrap;
+    display: flex;
+}
+
+.attachement-name {
+    margin: 0;
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+}
+
+.icon-cancel {
+    padding: 3px 1px 1px 0px;
+    font-size: 11px;
+    cursor: pointer;
+}

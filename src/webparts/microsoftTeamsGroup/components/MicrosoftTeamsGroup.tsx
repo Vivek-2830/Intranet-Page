@@ -247,7 +247,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
               </div>
             </div>
 
-          )
+          );
         }
       }
     ];
@@ -715,7 +715,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
             </div>
           </div>
 
-        </Dialog>
+          </Dialog>
 
           <div className='ms-Grid'>
             <DetailsList
@@ -872,7 +872,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
     this.GetTaskDetailsItems();
     this.setState({ EditTaskDialogOpen: true });
     this.setState({ TaskDetailsData: updatetaskdetails });
-    this.setState({ TaskFormSection1: true, TaskFormSection2: false, TaskFormSection3: false })
+    this.setState({ TaskFormSection1: true, TaskFormSection2: false, TaskFormSection3: false });
   }
 
   public async DeleteTaskDetails(DeleteTaskDetailsID) {
