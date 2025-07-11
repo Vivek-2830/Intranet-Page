@@ -419,12 +419,12 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
                               {
                                 this.state.TaskFormSection3 == true ?
                                   <>
-                                    <div className='ms-Grid-col ms-sm12 ms-md12 ms-lg12'>
+                                    {/* <div className='ms-Grid-col ms-sm12 ms-md12 ms-lg12'>
                                       <div className="Add-Attachments">
                                         <label className='Attachment-titla'>Attachments</label>
                                       </div>
                                       <label className='Attachmentlabel' htmlFor='Project Document'>Choose files</label>
-                                      <input style={{ display: 'none' }} id="Project Document" type="file" multiple onChange={(e) => this.GetUploadAttachments(e.target.files, "Attachments", "")}></input>
+                                      <input style={{ display: 'none' }} id="Project Document" type="file" multiple onChange={(e) => this.UploadAttachments(e.target.files, "Attachments", "")}></input>
                                       <div className="Attachment-wrap">
                                         {
                                           this.state.UploadDocuments.length > 0 && (
@@ -446,7 +446,7 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
                                           )
                                         }
                                       </div>
-                                    </div>
+                                    </div> */}
 
                                     <div className='ms-Grid-col ms-sm12 ms-md12 ms-lg12'>
                                       <div className='Project-Submit'>
@@ -624,10 +624,10 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
       console.log(projectdetails);
 
       if (data.length > 0) {
-        data.forEach((item, i) => {
+        data.forEach(async (item, i) => {
 
-          // const item1: IItem = sp.web.lists.getByTitle("Project Details").items.getById(item.Id);
-          // const info: IAttachmentInfo[] = await item1.attachmentFiles();
+          const item1: IItem = sp.web.lists.getByTitle("Project Details").items.getById(item.Id);
+          const info: IAttachmentInfo[] = await item1.attachmentFiles();
 
           AllData.push({
             ID: item.Id ? item.Id : "",
@@ -638,7 +638,7 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
             ProjectStatus: item.ProjectStatus ? item.ProjectStatus : "",
             ProjectManager: item.ProjectManager ? item.ProjectManager : "",
             AssignedTo: item.AssignedTo ? item.AssignedTo.Title : "",
-            Attachments: item.Attachments ? item.Attachments : "",
+            Attachments: info,
             isfilechanged: false,
           });
         });
@@ -699,23 +699,42 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
     }
   }
 
-  public async GetUploadAttachments(files, Doctype, Title) {
-    let ProjectDocumentslist = this.state.UploadDocuments;
+  public async UploadAttachments(files, id:number, Title) {
+    const updatedetails = this.state.ProjectDetails.map(item => {
+      if(item.Title === Title) {
+        return {
+          ...item,
+          file: item.file ? [...item.file, ...files] : [...files],
+          isfilechanged: true,
+        };
+      } 
+      else {
+        return item;
+      }
+    });
 
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      ProjectDocumentslist.push({ key: file, text: Doctype });
-      ProjectDocumentslist.push({
-        ID: "",
-        Filename: file.name,
-        DocumentType: Title,
-        TempId: this.state.TempId + (i + 1),
+    const uploadeddoc = this.state.UploadDocuments;
+
+    const fileArray = [...files];
+    fileArray.map(item => {
+      uploadeddoc.push({
+        Id: uploadeddoc[0].Id,
+        FileName: item.name,
+        file : item,
+        DocumentType: Title
       });
-      let test = this.state.TempId + (i + 1);
-      this.setState({ TempId: test });
-    }
-    this.setState({ UploadDocuments: ProjectDocumentslist });
-    console.log(this.state.UploadDocuments);
+    });
+
+    const docTypeSet: Set<string> = new Set();
+    uploadeddoc.forEach(doc => {
+      if (doc.DocumentType) {
+        docTypeSet.add(doc.DocumentType);
+      }
+    });
+
+    const uniqueDocumentTypes = [];
+    docTypeSet.forEach(type => uniqueDocumentTypes.push(type));
+
   }
 
   public RemoveAttachments(tempid, Id, filename) {
