@@ -3,11 +3,12 @@ import styles from './ProjectDetails.module.scss';
 import { IProjectDetailsProps } from './IProjectDetailsProps';
 import { escape, update } from '@microsoft/sp-lodash-subset';
 import { sp } from '@pnp/sp/presets/all';
-import { PeoplePicker, PrincipalType } from "@pnp/spfx-controls-react/lib/PeoplePicker";
 import { DatePicker, DefaultButton, DetailsList, Dialog, Dropdown, IColumn, Icon, IIconProps, Label, PrimaryButton, SearchBox, TextField } from 'office-ui-fabric-react';
 import { IItem, Item } from '@pnp/sp/items';
 import { Attachments, IAttachmentInfo } from '@pnp/sp/attachments';
 import * as moment from 'moment';
+import { Web } from '@pnp/sp/webs';
+import {  PeoplePicker, PrincipalType } from "@pnp/spfx-controls-react/lib/PeoplePicker"; 
 
 
 export interface IProjectDetailsState {
@@ -27,7 +28,7 @@ export interface IProjectDetailsState {
   RemoveAttachment: any;
   UploadDocuments: any;
   ProjectDocuments: any;
-  GetAllProjectDocuments: any;
+  AllProjectDocuments: any;
   TempId: number;
   DeleteDocuments: any;
   EditProjectName: any;
@@ -47,6 +48,9 @@ export interface IProjectDetailsState {
   TaskFormSection1: boolean;
   TaskFormSection2: boolean;
   TaskFormSection3: boolean;
+  GetAllDocument: any;
+  Isloader: boolean;
+
 }
 
 const addIcon: IIconProps = { iconName: 'Add' };
@@ -109,15 +113,15 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
       ProjectStatus: [],
       ProjectStatuslist: [],
       ProjectManager: "",
-      AssignedTo: "",
-      AssignedToID: "",
+      AssignedTo: [],
+      AssignedToID: [],
       Attachments: "",
       ProjectDetailsAddOpenDialog: true,
       ProjectDetailsEditOpenDialog: true,
       RemoveAttachment: [],
       UploadDocuments: [],
       ProjectDocuments: [],
-      GetAllProjectDocuments: [],
+      AllProjectDocuments: [],
       TempId: 0,
       DeleteDocuments: [],
       EditProjectName: "",
@@ -137,6 +141,8 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
       TaskFormSection1: true,
       TaskFormSection2: false,
       TaskFormSection3: false,
+      GetAllDocument: [],
+      Isloader: false, 
     };
 
   }
@@ -188,7 +194,7 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
       },
       {
         key: "AssignedTo",
-        name: "AssignedTo",
+        name: "Assigned To",
         fieldName: "AssignedTo",
         minWidth: 100,
         maxWidth: 200,
@@ -388,14 +394,12 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
                                 <PeoplePicker
                                   context={this.props.context}
                                   titleText="Assigned To:"
-                                  personSelectionLimit={1}
+                                  personSelectionLimit={4}
                                   placeholder='Select Assigned To'
                                   showtooltip={true}
                                   required={true}
-                                  defaultSelectedUsers={[this.state.AssignedTo.Title]}
-                                  onChange={(e) =>
-                                    this.setState({ AssignedToID: e[0].id, AssignedTo: e[0].text })
-                                  }
+                                  defaultSelectedUsers={this.state.AssignedTo}
+                                  onChange={this._getPeoplePickerItems}
                                   principalTypes={[PrincipalType.User]}
                                   resolveDelay={300}
                                   ensureUser={true}
@@ -419,34 +423,10 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
                               {
                                 this.state.TaskFormSection3 == true ?
                                   <>
-                                    {/* <div className='ms-Grid-col ms-sm12 ms-md12 ms-lg12'>
-                                      <div className="Add-Attachments">
-                                        <label className='Attachment-titla'>Attachments</label>
-                                      </div>
-                                      <label className='Attachmentlabel' htmlFor='Project Document'>Choose files</label>
-                                      <input style={{ display: 'none' }} id="Project Document" type="file" multiple onChange={(e) => this.UploadAttachments(e.target.files, "Attachments", "")}></input>
-                                      <div className="Attachment-wrap">
-                                        {
-                                          this.state.UploadDocuments.length > 0 && (
-                                            this.state.UploadDocuments.map((item) => {
-                                              return (
-                                                <>
-                                                  {
-                                                    item.text == "Attachments" ?
-                                                      <>
-                                                        <div>
-                                                          <p className="attachement-name">{item.key.name}</p>
-                                                          <Icon iconName='Cancel' className="icon-cancel" onClick={(e) => this.RemoveAttachments(item.TempId, item.ID, item.key.name)}></Icon>
-                                                        </div>
-                                                      </> : <></>
-                                                  }
-                                                </>
-                                              );
-                                            })
-                                          )
-                                        }
-                                      </div>
-                                    </div> */}
+                                    <div className='ms-Grid-col ms-sm12 ms-md12 ms-lg12'>
+                                      <Label>Add Attachment:</Label>
+                                      <input id="Document ID" type="file" multiple onChange={(e) => this.GetAttachments(e.target.files)} />
+                                    </div>
 
                                     <div className='ms-Grid-col ms-sm12 ms-md12 ms-lg12'>
                                       <div className='Project-Submit'>
@@ -579,6 +559,19 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
 
           </Dialog>
 
+          {
+          this.state.Isloader == true ?
+            <>
+              <div className='LoaderBg-overlay'>
+                <div id="loading-wrapper">
+                  <div id="loading-text"></div>
+                  <div id="loading-content"></div>
+                  <label className='Loader-Text'>Please Wait.!!</label>
+                </div>
+              </div>
+            </> : <></>
+        }
+
           <div className='ms-Grid'>
             <DetailsList
               className='ProjectDetails-List'
@@ -617,17 +610,14 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
       "ProjectManager",
       "AssignedTo/Id",
       "AssignedTo/Title",
-      "Attachments"
+      // "Attachments"
     ).expand("AssignedTo").get().then((data) => {
       let AllData = [];
       console.log(data);
       console.log(projectdetails);
 
       if (data.length > 0) {
-        data.forEach(async (item, i) => {
-
-          const item1: IItem = sp.web.lists.getByTitle("Project Details").items.getById(item.Id);
-          const info: IAttachmentInfo[] = await item1.attachmentFiles();
+        data.forEach((item, i) => {
 
           AllData.push({
             ID: item.Id ? item.Id : "",
@@ -638,8 +628,7 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
             ProjectStatus: item.ProjectStatus ? item.ProjectStatus : "",
             ProjectManager: item.ProjectManager ? item.ProjectManager : "",
             AssignedTo: item.AssignedTo ? item.AssignedTo.Title : "",
-            Attachments: info,
-            isfilechanged: false,
+            // Attachments: item.Attachments ? item.Attachments : "",
           });
         });
         this.setState({ ProjectDetails: AllData, AllProjectListDetails: AllData });
@@ -651,94 +640,84 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
   }
 
   public async AddProjectDetails() {
+
+    
+
     if (this.state.ProjectName.length == 0) {
       alert("Please enter Project Details");
-    }
-    else {
-      const addProjectdetails: any = await sp.web.lists.getByTitle("Project Details").items.add({
+    } else {
+      const projectId = await sp.web.lists.getByTitle("Project Details").items.add({
         ProjectName: this.state.ProjectName,
         ProjectDescription: this.state.ProjectDescription,
-        ProjectStartDate: moment(this.state.ProjectStartDate).format("DD-MM-YYYY"),
+        ProjectStartDate: this.state.ProjectStartDate,
         ProjectEndDate: this.state.ProjectEndDate,
         ProjectStatus: this.state.ProjectStatus,
         ProjectManager: this.state.ProjectManager,
-        AssignedTo: this.state.AssignedTo,
-        Attachments: this.state.Attachments
-      })
-        .catch((error) => {
-          console.log(error);
-        });
+        AssignedToId: {results : this.state.AssignedToID.Title}
+      });
 
-      for (let i = 0; i < this.state.RemoveAttachment.length; i++) {
-        const file = this.state.RemoveAttachment[i];
+      this.setState({ Isloader: true });
 
-        try {
-          const item1: IItem = await sp.web.lists.getByTitle("Project Details").items.getById(file.Id);
-          await item1.attachmentFiles.getByName(file.FileName).delete();
-        } catch (error) {
-          console.log(`Error : ${file.FileName}`);
-        }
-      }
-      this.setState({ RemoveAttachment: [] });
+        const Id = (await projectId).data.ID;
+        sp.web.lists.getByTitle("Project Details").items.getById(Id).attachmentFiles.addMultiple(this.state.AllProjectDocuments); 
 
-      for (let i = 0; i < this.state.UploadDocuments.length; i++) {
-        const file = this.state.UploadDocuments[i];
+      // if (this.state.AllProjectDocuments.length > 0) {
+      //   const libraryName = "Project Documents";
 
-        try {
-          const item2: IItem = await sp.web.lists.getByTitle("Project Details").items.getById(file.Id);
-          await item2.attachmentFiles.add(file.FileName, file.FileContent);
-        } catch (error) {
-          console.log(`Error uploading file ${file.FileName}: `, error);
-        }
-      }
-      this.GetProjectDetails();
-      this.setState({ UploadDocuments: [] });
-      this.setState({ ProjectDetails: addProjectdetails });
+      //   for (let i = 0; i < this.state.AllProjectDocuments.length; i++) {
+      //     const file = this.state.AllProjectDocuments[i];
+
+      //     try {
+      //       await sp.web.lists.getByTitle('Project Documents').rootFolder.files.add(file.key.name, file.key, true).then(f =>
+      //         f.file.getItem().then(Item => {
+      //           Item.update({
+      //             FileName: file.name,
+      //             RequestIdId: addProjectdetails.data.ID
+      //           });
+      //         })
+      //       );
+      //       console.log(`Uploaded: ${file.key.name}`);
+      //     } catch (error) {
+      //       console.error("Error uploading", error);
+      //     }
+      //   }
+
+      //   if (this.state.DeleteDocuments.length > 0) {
+      //     for (let i = 0; i < this.state.DeleteDocuments.length; i++) {
+      //       let id = this.state.DeleteDocuments[i];
+      //       let web = Web(this.props.webURL);
+
+      //       await web.lists.getByTitle("Project Documents").items.getById(id.ID).delete()
+      //         .then(i => {
+      //           console.log(i);
+      //         });
+      //     }
+      //   }
+      // }
+      this.setState({ Isloader: false });
+      this.setState({ AllProjectDocuments: [] });
+      this.setState({ ProjectDetails: projectId });
       this.setState({ ProjectDetailsAddOpenDialog: true });
       this.setState({ TaskFormSection1: true, TaskFormSection2: false, TaskFormSection3: false });
     }
+
   }
 
-  public async UploadAttachments(files, id:number, Title) {
-    const updatedetails = this.state.ProjectDetails.map(item => {
-      if(item.Title === Title) {
-        return {
-          ...item,
-          file: item.file ? [...item.file, ...files] : [...files],
-          isfilechanged: true,
-        };
-      } 
-      else {
-        return item;
-      }
-    });
-
-    const uploadeddoc = this.state.UploadDocuments;
-
-    const fileArray = [...files];
-    fileArray.map(item => {
-      uploadeddoc.push({
-        Id: uploadeddoc[0].Id,
-        FileName: item.name,
-        file : item,
-        DocumentType: Title
+  public GetAttachments(files) {
+    let Projectdetaildoc = this.state.AllProjectDocuments;
+    for(let i = 0; i < files.length; i++) {
+      const file = files[i];
+      Projectdetaildoc.push({
+        name: file.name,
+        content: file
       });
-    });
-
-    const docTypeSet: Set<string> = new Set();
-    uploadeddoc.forEach(doc => {
-      if (doc.DocumentType) {
-        docTypeSet.add(doc.DocumentType);
-      }
-    });
-
-    const uniqueDocumentTypes = [];
-    docTypeSet.forEach(type => uniqueDocumentTypes.push(type));
-
+    }
+    this.setState({ AllProjectDocuments : Projectdetaildoc });
+    console.log(this.state.AllProjectDocuments);
   }
 
   public RemoveAttachments(tempid, Id, filename) {
-    var array = this.state.GetAllProjectDocuments;
+    var array = this.state.AllProjectDocuments;
     var array2 = this.state.UploadDocuments;
 
     var index = array.findIndex(x => x.TempId === tempid);
@@ -746,7 +725,7 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
 
     if (index !== -1) {
       array.splice(index, 1);
-      this.setState({ GetAllProjectDocuments: array });
+      this.setState({ AllProjectDocuments: array });
     }
 
     if (index2 !== -1) {
@@ -767,7 +746,7 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
 
     console.log(this.state.RemoveAttachment);
     console.log(this.state.UploadDocuments);
-    console.log(this.state.GetAllProjectDocuments);
+    console.log(this.state.AllProjectDocuments);
   }
 
   public async GetProjectDetailsItem() {

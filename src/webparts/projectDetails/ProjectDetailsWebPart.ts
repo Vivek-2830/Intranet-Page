@@ -41,7 +41,10 @@ export default class ProjectDetailsWebPart extends BaseClientSideWebPart<IProjec
         environmentMessage: this._environmentMessage,
         hasTeamsContext: !!this.context.sdks.microsoftTeams,
         userDisplayName: this.context.pageContext.user.displayName,
-        context: this.context
+        userEmail:this.context.pageContext.user.email,
+        context: this.context,
+        UserId:this.context.pageContext.user.loginName,
+        webURL:this.context.pageContext.web.absoluteUrl
       }
     );
 

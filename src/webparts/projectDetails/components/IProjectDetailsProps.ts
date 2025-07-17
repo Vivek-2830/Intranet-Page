@@ -4,5 +4,8 @@ export interface IProjectDetailsProps {
   environmentMessage: string;
   hasTeamsContext: boolean;
   userDisplayName: string;
+  userEmail:string;
   context : any;
+  webURL:string;
+  UserId:any;
 }
