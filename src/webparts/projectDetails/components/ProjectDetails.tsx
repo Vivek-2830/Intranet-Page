@@ -8,8 +8,8 @@ import { IItem, Item } from '@pnp/sp/items';
 import { Attachments, IAttachmentInfo } from '@pnp/sp/attachments';
 import * as moment from 'moment';
 import { Web } from '@pnp/sp/webs';
-import {  PeoplePicker, PrincipalType } from "@pnp/spfx-controls-react/lib/PeoplePicker"; 
-
+import { PeoplePicker, PrincipalType } from "@pnp/spfx-controls-react/lib/PeoplePicker";
+import * as Chart from "../assets/js/Chart.min.js";
 
 export interface IProjectDetailsState {
   ProjectDetails: any;
@@ -95,6 +95,9 @@ const deletmodelProps = {
   className: "Delet-Dialog"
 };
 
+let ctx;
+
+
 require("../assets/css/style.css");
 require("../assets/css/fabric.min.css");
 
@@ -142,7 +145,7 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
       TaskFormSection2: false,
       TaskFormSection3: false,
       GetAllDocument: [],
-      Isloader: false, 
+      Isloader: false,
     };
 
   }
@@ -199,6 +202,13 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
         minWidth: 100,
         maxWidth: 200,
         isResizable: false,
+        onRender: (item) => {
+          return <span>
+            {item.AssignedTo && item.AssignedTo.length > 0
+              ? item.AssignedTo.map(member => member.Title).join(', ')
+              : ''}
+          </span>;
+        }
       },
       {
         key: "Actions",
@@ -398,7 +408,7 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
                                   placeholder='Select Assigned To'
                                   showtooltip={true}
                                   required={true}
-                                  defaultSelectedUsers={this.state.AssignedTo}
+                                  // defaultSelectedUsers={[this.state.AssignedTo]}
                                   onChange={this._getPeoplePickerItems}
                                   principalTypes={[PrincipalType.User]}
                                   resolveDelay={300}
@@ -466,8 +476,6 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
 
             </div>
 
-
-
           </Dialog>
 
           <Dialog
@@ -491,86 +499,191 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
             modalProps={updatemodelProps}
             minWidth={500}
           >
-            <div>
-              <div className='ms-Grid-row'>
+            <div className="ms-Grid-row">
 
-                <div className='ms-Grid-col ms-sm12 ms-md6 ms-lg6'>
-                  <TextField
-                    label="Project Name"
-                    type="text"
-                    required={true}
-                    onChange={(value) =>
-                      this.setState({ EditProjectName: value.target["value"] })
-                    }
-                  />
-                </div>
+              <div>
+                {
+                  this.state.TaskFormSection1 == true ?
+                    <>
+                      <div className='ms-Grid-col ms-sm12 ms-md6 ms-lg6'>
+                        <div className='Add-ProjectName'>
+                          <TextField
+                            label="Project Name"
+                            type='text'
+                            required
+                            onChange={(value) => this.setState({ EditProjectName: value.target["value"] })}
+                          />
+                        </div>
+                      </div>
 
-                <div className='ms-Grid-col ms-sm12 ms-md6 ms-lg6'>
-                  <DatePicker
-                    label='Start Date'
-                    allowTextInput={false}
-                    value={this.state.EditProjectStartDate ? this.state.EditProjectStartDate : null}
-                    onSelectDate={(date: any) => this.setState({ EditProjectStartDate: date })}
-                    aria-label="Select a Date" placeholder='Select a Project Start Date' isRequired
-                  />
-                </div>
+                      <div className="ms-Grid-col ms-sm12 ms-md6 ms-lg6">
+                        <div className='Add-StartDate'>
+                          <DatePicker
+                            label='Start Date'
+                            allowTextInput={false}
+                            value={this.state.EditProjectStartDate ? this.state.EditProjectStartDate : null}
+                            onSelectDate={(date: any) => this.setState({ EditProjectStartDate: date })}
+                            aria-label="Select a Date" placeholder='Select a Project Start Date' isRequired
+                          />
+                        </div>
+                      </div>
 
-                <div className='ms-Grid-col ms-sm12 ms-md12 ms-lg12'>
-                  <TextField
-                    label="Project Description"
-                    type="text"
-                    multiline rows={3}
-                    required={true}
-                    onChange={(value) =>
-                      this.setState({ EditProjectDescription: value.target["value"] })
-                    }
-                  />
-                </div>
+                      <div className='ms-Grid-col ms-sm12 ms-md12 ms-lg12'>
+                        <div className='Add-ProjectDescription'>
+                          <TextField
+                            label="Project Description"
+                            type="text"
+                            multiline rows={3}
+                            required={true}
+                            onChange={(value) =>
+                              this.setState({ EditProjectDescription: value.target["value"] })
+                            }
+                          />
+                        </div>
+                      </div>
 
-                <div className='ms-Grid-col ms-sm12 ms-md6 ms-lg6'>
-                  <div className='Add-EndDate'>
-                    <DatePicker
-                      label='End Date'
-                      allowTextInput={false}
-                      value={this.state.EditProjectEndDate ? this.state.EditProjectEndDate : null}
-                      onSelectDate={(date: any) => this.setState({ EditProjectEndDate: date })}
-                      aria-label="Select a Date" placeholder='Select a Project End Date' isRequired
-                    />
-                  </div>
-                </div>
+                      <div className='ms-Grid-col ms-sm12 ms-md6 ms-lg6'>
+                        <div className='Add-EndDate'>
+                          <DatePicker
+                            label='End Date'
+                            allowTextInput={false}
+                            value={this.state.EditProjectEndDate ? this.state.EditProjectEndDate : null}
+                            onSelectDate={(date: any) => this.setState({ EditProjectEndDate: date })}
+                            aria-label="Select a Date" placeholder='Select a Project End Date' isRequired
+                          />
+                        </div>
+                      </div>
 
-                <div className='ms-Grid-col ms-sm12 ms-md6 ms-lg6'>
-                  <div className='Add-ProjectStatus'>
-                    <Dropdown
-                      options={this.state.ProjectStatuslist}
-                      label="Project Status"
-                      required
-                      placeholder="Select Project Status"
-                      defaultSelectedKeys={this.state.EditProjectStatus}
-                      onChange={(e, option, text) =>
-                        this.setState({ EditProjectStatus: option.text })
-                      }
-                    />
-                  </div>
-                </div>
+                      <div className="ms-Grid-col ms-sm12 ms-md12 ms-lg12">
+                        <div className='Next'>
+                          <PrimaryButton
+                            text="Next"
+                            onClick={() => this.setState({ TaskFormSection1: false, TaskFormSection2: true })}
+                          />
+                        </div>
+                      </div>
 
+                    </>
+                    :
+                    <>
+                      <div>
+                        {
+                          this.state.TaskFormSection2 == true ?
+                            <>
+                              <div className='ms-Grid-col ms-sm12 ms-md6 ms-lg6'>
+                                <div className='Add-ProjectStatus'>
+                                  <Dropdown
+                                    options={this.state.ProjectStatuslist}
+                                    label="Project Status"
+                                    required
+                                    placeholder="Select Project Status"
+                                    onChange={(e, option, text) =>
+                                      this.setState({ EditProjectStatus: option.text })
+                                    }
+                                  />
+                                </div>
+                              </div>
+
+                              <div className='ms-Grid-col ms-sm12 ms-md6 ms-lg6'>
+                                <div className='Add-ProjectManager'>
+                                  <TextField
+                                    label="Project Manager"
+                                    type="text"
+                                    required={true}
+                                    onChange={(value) =>
+                                      this.setState({ EditProjectManager: value.target["value"] })
+                                    }
+                                  />
+                                </div>
+                              </div>
+
+                              <div className='ms-Grid-col ms-sm12 ms-md6 ms-lg6'>
+                                <div className='Add-AssignedTo'>
+                                  <PeoplePicker
+                                    context={this.props.context}
+                                    titleText="Assigned To:"
+                                    personSelectionLimit={4}
+                                    placeholder='Select Assigned To'
+                                    showtooltip={true}
+                                    required={true}
+                                    defaultSelectedUsers={[this.state.EditAssignedTo]}
+                                    onChange={this._getPeoplePickerItems}
+                                    principalTypes={[PrincipalType.User]}
+                                    resolveDelay={300}
+                                    ensureUser={true}
+                                  />
+                                </div>
+                              </div>
+
+                              <div className='ms-Grid-col ms-sm12 ms-md12 ms-lg12'>
+                                <div className='Next'>
+                                  <PrimaryButton
+                                    text="Next"
+                                    onClick={() => this.setState({ TaskFormSection2: false, TaskFormSection3: true })}
+                                  />
+                                </div>
+                              </div>
+                            </>
+                            :
+                            <>
+                              <div>
+                                {
+                                  this.state.TaskFormSection3 == true ?
+                                    <>
+                                      <div className='ms-Grid-col ms-sm12 ms-md12 ms-lg12'>
+                                        <Label>Add Attachment:</Label>
+                                        <input id="Document ID" type="file" multiple onChange={(e) => this.GetAttachments(e.target.files)} />
+                                      </div>
+
+                                      <div className='ms-Grid-col ms-sm12 ms-md12 ms-lg12'>
+                                        <div className='Project-Submit'>
+                                          <div className='Add-Submit'>
+                                            <PrimaryButton
+                                              iconProps={SendIcon}
+                                              text="Submit"
+                                              onClick={() => this.AddProjectDetails()}
+                                            />
+                                          </div>
+
+                                          <div className='Cancel-Project'>
+                                            <DefaultButton
+                                              iconProps={CancelIcon}
+                                              text="Cancel"
+                                              onClick={() =>
+                                                this.setState({ ProjectDetailsEditOpenDialog: true, TaskFormSection1: true, TaskFormSection2: false, TaskFormSection3: false })
+                                              }
+                                            />
+                                          </div>
+                                        </div>
+
+                                      </div>
+                                    </>
+                                    :
+                                    <>
+                                    </>
+                                }
+                              </div>
+                            </>
+                        }
+                      </div>
+                    </>
+                }
               </div>
             </div>
-
           </Dialog>
 
           {
-          this.state.Isloader == true ?
-            <>
-              <div className='LoaderBg-overlay'>
-                <div id="loading-wrapper">
-                  <div id="loading-text"></div>
-                  <div id="loading-content"></div>
-                  <label className='Loader-Text'>Please Wait.!!</label>
+            this.state.Isloader == true ?
+              <>
+                <div className='LoaderBg-overlay'>
+                  <div id="loading-wrapper">
+                    <div id="loading-text"></div>
+                    <div id="loading-content"></div>
+                    <label className='Loader-Text'>Please Wait.!!</label>
+                  </div>
                 </div>
-              </div>
-            </> : <></>
-        }
+              </> : <></>
+          }
 
           <div className='ms-Grid'>
             <DetailsList
@@ -627,7 +740,7 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
             ProjectEndDate: item.ProjectEndDate ? item.ProjectEndDate : "",
             ProjectStatus: item.ProjectStatus ? item.ProjectStatus : "",
             ProjectManager: item.ProjectManager ? item.ProjectManager : "",
-            AssignedTo: item.AssignedTo ? item.AssignedTo.Title : "",
+            AssignedTo: item.AssignedTo ? item.AssignedTo : "",
             // Attachments: item.Attachments ? item.Attachments : "",
           });
         });
@@ -641,7 +754,7 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
 
   public async AddProjectDetails() {
 
-    
+    this.setState({ Isloader: true });
 
     if (this.state.ProjectName.length == 0) {
       alert("Please enter Project Details");
@@ -653,66 +766,32 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
         ProjectEndDate: this.state.ProjectEndDate,
         ProjectStatus: this.state.ProjectStatus,
         ProjectManager: this.state.ProjectManager,
-        AssignedToId: {results : this.state.AssignedToID.Title}
+        AssignedToId: { results: this.state.AssignedToID }
       });
 
-      this.setState({ Isloader: true });
+      const Id = (await projectId).data.ID;
+      sp.web.lists.getByTitle("Project Details").items.getById(Id).attachmentFiles.addMultiple(this.state.AllProjectDocuments);
 
-        const Id = (await projectId).data.ID;
-        sp.web.lists.getByTitle("Project Details").items.getById(Id).attachmentFiles.addMultiple(this.state.AllProjectDocuments); 
-
-      // if (this.state.AllProjectDocuments.length > 0) {
-      //   const libraryName = "Project Documents";
-
-      //   for (let i = 0; i < this.state.AllProjectDocuments.length; i++) {
-      //     const file = this.state.AllProjectDocuments[i];
-
-      //     try {
-      //       await sp.web.lists.getByTitle('Project Documents').rootFolder.files.add(file.key.name, file.key, true).then(f =>
-      //         f.file.getItem().then(Item => {
-      //           Item.update({
-      //             FileName: file.name,
-      //             RequestIdId: addProjectdetails.data.ID
-      //           });
-      //         })
-      //       );
-      //       console.log(`Uploaded: ${file.key.name}`);
-      //     } catch (error) {
-      //       console.error("Error uploading", error);
-      //     }
-      //   }
-
-      //   if (this.state.DeleteDocuments.length > 0) {
-      //     for (let i = 0; i < this.state.DeleteDocuments.length; i++) {
-      //       let id = this.state.DeleteDocuments[i];
-      //       let web = Web(this.props.webURL);
-
-      //       await web.lists.getByTitle("Project Documents").items.getById(id.ID).delete()
-      //         .then(i => {
-      //           console.log(i);
-      //         });
-      //     }
-      //   }
-      // }
       this.setState({ Isloader: false });
       this.setState({ AllProjectDocuments: [] });
       this.setState({ ProjectDetails: projectId });
       this.setState({ ProjectDetailsAddOpenDialog: true });
       this.setState({ TaskFormSection1: true, TaskFormSection2: false, TaskFormSection3: false });
+      this.GetProjectDetails();
     }
 
   }
 
   public GetAttachments(files) {
     let Projectdetaildoc = this.state.AllProjectDocuments;
-    for(let i = 0; i < files.length; i++) {
+    for (let i = 0; i < files.length; i++) {
       const file = files[i];
       Projectdetaildoc.push({
         name: file.name,
         content: file
       });
     }
-    this.setState({ AllProjectDocuments : Projectdetaildoc });
+    this.setState({ AllProjectDocuments: Projectdetaildoc });
     console.log(this.state.AllProjectDocuments);
   }
 
@@ -761,16 +840,19 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
   }
 
   public _getPeoplePickerItems = async (items: any[]) => {
+
     if (items.length > 0) {
-      const assigneto = items.map(item => item.text);
-      const assignetoID = items.map(item => item.id);
-      this.setState({ AssignedTo: assigneto });
-      this.setState({ AssignedToID: assignetoID });
+
+      const memberNames = items.map(item => item.text);
+      const memberIDs = items.map(item => item.id);
+      this.setState({ AssignedTo: memberNames });
+      this.setState({ AssignedToID: memberIDs });
     }
     else {
       this.setState({ AssignedTo: [] });
       this.setState({ AssignedToID: [] });
     }
+    console.log(this.state.AssignedToID);
   }
 
   public async GetEditProjectDetails(ID) {
@@ -783,8 +865,8 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
     this.setState({
       EditProjectName: EditProjectdetails[0].ProjectName,
       EditProjectDescription: EditProjectdetails[0].ProjectDescription,
-      EditProjectStartDate: moment(this.state.ProjectStartDate).format("DD-MM-YYYY"),
-      EditProjectEndDate: moment(this.state.ProjectStartDate).format("DD-MM-YYYY"),
+      EditProjectStartDate: EditProjectdetails[0].ProjectStartDate,
+      EditProjectEndDate: EditProjectdetails[0].ProjectEndDate,
       EditProjectStatus: EditProjectdetails[0].ProjectStatus,
       EditProjectManager: EditProjectdetails[0].ProjectManager,
       EditAssignedTo: EditProjectdetails[0].AssignedTo,
@@ -797,8 +879,8 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
     const updatedetails = await sp.web.lists.getByTitle("Project Details").items.getById(CurrentProjectDetailsID).update({
       ProjectName: this.state.EditProjectName,
       ProjectDescription: this.state.EditProjectDescription,
-      ProjectStartDate: moment(this.state.ProjectStartDate).format("DD-MM-YYYY"),
-      ProjectEndDate: moment(this.state.ProjectStartDate).format("DD-MM-YYYY"),
+      ProjectStartDate:this.state.EditProjectStartDate,
+      ProjectEndDate:this.state.EditProjectEndDate,
       ProjectStatus: this.state.EditProjectStatus,
       ProjectManager: this.state.EditProjectManager,
       AssignedTo: this.state.EditAssignedTo,
