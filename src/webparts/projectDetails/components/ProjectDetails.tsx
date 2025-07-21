@@ -512,6 +512,7 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
                             type='text'
                             required
                             onChange={(value) => this.setState({ EditProjectName: value.target["value"] })}
+                            value={this.state.EditProjectName}
                           />
                         </div>
                       </div>
@@ -522,7 +523,6 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
                             label='Start Date'
                             allowTextInput={false}
                             value={this.state.EditProjectStartDate ? this.state.EditProjectStartDate : null}
-                            onSelectDate={(date: any) => this.setState({ EditProjectStartDate: date })}
                             aria-label="Select a Date" placeholder='Select a Project Start Date' isRequired
                           />
                         </div>
@@ -538,6 +538,7 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
                             onChange={(value) =>
                               this.setState({ EditProjectDescription: value.target["value"] })
                             }
+                            value={this.state.EditProjectDescription}
                           />
                         </div>
                       </div>
@@ -548,7 +549,6 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
                             label='End Date'
                             allowTextInput={false}
                             value={this.state.EditProjectEndDate ? this.state.EditProjectEndDate : null}
-                            onSelectDate={(date: any) => this.setState({ EditProjectEndDate: date })}
                             aria-label="Select a Date" placeholder='Select a Project End Date' isRequired
                           />
                         </div>
@@ -577,6 +577,7 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
                                     label="Project Status"
                                     required
                                     placeholder="Select Project Status"
+                                    defaultSelectedKey={this.state.EditProjectStatus}
                                     onChange={(e, option, text) =>
                                       this.setState({ EditProjectStatus: option.text })
                                     }
@@ -593,6 +594,7 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
                                     onChange={(value) =>
                                       this.setState({ EditProjectManager: value.target["value"] })
                                     }
+                                    value={this.state.EditProjectManager}
                                   />
                                 </div>
                               </div>
@@ -606,7 +608,7 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
                                     placeholder='Select Assigned To'
                                     showtooltip={true}
                                     required={true}
-                                    defaultSelectedUsers={[this.state.EditAssignedTo]}
+                                    defaultSelectedUsers={this.state.EditAssignedTo}
                                     onChange={this._getPeoplePickerItems}
                                     principalTypes={[PrincipalType.User]}
                                     resolveDelay={300}
@@ -616,17 +618,31 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
                               </div>
 
                               <div className='ms-Grid-col ms-sm12 ms-md12 ms-lg12'>
-                                <div className='Next'>
-                                  <PrimaryButton
-                                    text="Next"
-                                    onClick={() => this.setState({ TaskFormSection2: false, TaskFormSection3: true })}
-                                  />
+                                <div className='Project-Submit'>
+                                  <div className='Add-Submit'>
+                                    <PrimaryButton
+                                      iconProps={SendIcon}
+                                      text="Submit"
+                                      onClick={() => this.UpdateProjectDetails(this.state.CurrentProjectDetailsID)}
+                                    />
+                                  </div>
+
+                                  <div className='Cancel-Project'>
+                                    <DefaultButton
+                                      iconProps={CancelIcon}
+                                      text="Cancel"
+                                      onClick={() =>
+                                        this.setState({ ProjectDetailsEditOpenDialog: true, TaskFormSection1: true, TaskFormSection2: false})
+                                      }
+                                    />
+                                  </div>
                                 </div>
+
                               </div>
                             </>
                             :
                             <>
-                              <div>
+                              {/* <div>
                                 {
                                   this.state.TaskFormSection3 == true ?
                                     <>
@@ -635,34 +651,13 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
                                         <input id="Document ID" type="file" multiple onChange={(e) => this.GetAttachments(e.target.files)} />
                                       </div>
 
-                                      <div className='ms-Grid-col ms-sm12 ms-md12 ms-lg12'>
-                                        <div className='Project-Submit'>
-                                          <div className='Add-Submit'>
-                                            <PrimaryButton
-                                              iconProps={SendIcon}
-                                              text="Submit"
-                                              onClick={() => this.AddProjectDetails()}
-                                            />
-                                          </div>
-
-                                          <div className='Cancel-Project'>
-                                            <DefaultButton
-                                              iconProps={CancelIcon}
-                                              text="Cancel"
-                                              onClick={() =>
-                                                this.setState({ ProjectDetailsEditOpenDialog: true, TaskFormSection1: true, TaskFormSection2: false, TaskFormSection3: false })
-                                              }
-                                            />
-                                          </div>
-                                        </div>
-
-                                      </div>
+                                      
                                     </>
                                     :
                                     <>
                                     </>
                                 }
-                              </div>
+                              </div> */}
                             </>
                         }
                       </div>
@@ -723,6 +718,7 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
       "ProjectManager",
       "AssignedTo/Id",
       "AssignedTo/Title",
+      "AssignedTo/EMail"
       // "Attachments"
     ).expand("AssignedTo").get().then((data) => {
       let AllData = [];
@@ -865,30 +861,31 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
     this.setState({
       EditProjectName: EditProjectdetails[0].ProjectName,
       EditProjectDescription: EditProjectdetails[0].ProjectDescription,
-      EditProjectStartDate: EditProjectdetails[0].ProjectStartDate,
-      EditProjectEndDate: EditProjectdetails[0].ProjectEndDate,
+      EditProjectStartDate: new Date(EditProjectdetails[0].ProjectStartDate),
+      EditProjectEndDate: new Date(EditProjectdetails[0].ProjectEndDate),
       EditProjectStatus: EditProjectdetails[0].ProjectStatus,
       EditProjectManager: EditProjectdetails[0].ProjectManager,
-      EditAssignedTo: EditProjectdetails[0].AssignedTo,
-      // EditAssignedToID: EditProjectdetails[0].AssignedToID,
+      EditAssignedTo: EditProjectdetails[0].AssignedTo.map(item => item.EMail),
+      // EditAssignedToID: EditProjectdetails[0].AssignedTo.map((item) => item.Id) .map(item => item.Title),
       EditAttachments: EditProjectdetails[0].Attachments,
     });
+    console.log(this.state.EditAssignedTo.EMail);
   }
 
   public async UpdateProjectDetails(CurrentProjectDetailsID) {
     const updatedetails = await sp.web.lists.getByTitle("Project Details").items.getById(CurrentProjectDetailsID).update({
       ProjectName: this.state.EditProjectName,
       ProjectDescription: this.state.EditProjectDescription,
-      ProjectStartDate:this.state.EditProjectStartDate,
-      ProjectEndDate:this.state.EditProjectEndDate,
+      ProjectStartDate: this.state.EditProjectStartDate ,
+      ProjectEndDate: this.state.EditProjectEndDate ,
       ProjectStatus: this.state.EditProjectStatus,
       ProjectManager: this.state.EditProjectManager,
-      AssignedTo: this.state.EditAssignedTo,
+      AssignedTo: this.state.EditAssignedTo ,
     }).catch((error) => {
       console.log(error);
     });
-    this.setState({ ProjectDetailsEditOpenDialog: true });
     this.setState({ ProjectDetails: updatedetails });
+    this.setState({ ProjectDetailsEditOpenDialog: true });
     this.GetProjectDetails();
   }
 
