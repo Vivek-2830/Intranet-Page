@@ -50,7 +50,9 @@ export interface IProjectDetailsState {
   TaskFormSection3: boolean;
   GetAllDocument: any;
   Isloader: boolean;
-
+  Projects : any;
+  InProgressCount : number;
+  CompletedCount : number;
 }
 
 const addIcon: IIconProps = { iconName: 'Add' };
@@ -134,8 +136,8 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
       EditProjectStatus: [],
       EditProjectStatuslist: [],
       EditProjectManager: "",
-      EditAssignedTo: "",
-      EditAssignedToID: "",
+      EditAssignedTo: [],
+      EditAssignedToID: [],
       EditAttachments: "",
       AllProjectListDetails: [],
       DeleteProjectDetailsDialog: true,
@@ -146,6 +148,9 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
       TaskFormSection3: false,
       GetAllDocument: [],
       Isloader: false,
+      Projects : [],
+      InProgressCount : 0,
+      CompletedCount : 0
     };
 
   }
@@ -253,6 +258,14 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
 
           <div className='Header-Title'>
             <h3>Project Details</h3>
+          </div>
+
+          <div className='NewsTagGraph'>
+            <div className="ms-Grid-col ms-sm12 ms-md12 ms-lg12 ">
+              <div style={{ display : 'block', width: '40%', height: '40%' }}>
+                <canvas id="myChart" width="200" height="150"></canvas>
+              </div>
+            </div>
           </div>
 
           <div className='ms-Grid-row'>
@@ -523,6 +536,7 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
                             label='Start Date'
                             allowTextInput={false}
                             value={this.state.EditProjectStartDate ? this.state.EditProjectStartDate : null}
+                            onSelectDate={(date: any) => this.setState({ EditProjectStartDate: date })}
                             aria-label="Select a Date" placeholder='Select a Project Start Date' isRequired
                           />
                         </div>
@@ -549,6 +563,7 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
                             label='End Date'
                             allowTextInput={false}
                             value={this.state.EditProjectEndDate ? this.state.EditProjectEndDate : null}
+                            onSelectDate={(date: any) => this.setState({ EditProjectEndDate: date })}
                             aria-label="Select a Date" placeholder='Select a Project End Date' isRequired
                           />
                         </div>
@@ -622,7 +637,7 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
                                   <div className='Add-Submit'>
                                     <PrimaryButton
                                       iconProps={SendIcon}
-                                      text="Submit"
+                                      text="Update"
                                       onClick={() => this.UpdateProjectDetails(this.state.CurrentProjectDetailsID)}
                                     />
                                   </div>
@@ -632,7 +647,7 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
                                       iconProps={CancelIcon}
                                       text="Cancel"
                                       onClick={() =>
-                                        this.setState({ ProjectDetailsEditOpenDialog: true, TaskFormSection1: true, TaskFormSection2: false})
+                                        this.setState({ ProjectDetailsEditOpenDialog: true, TaskFormSection1: true, TaskFormSection2: false })
                                       }
                                     />
                                   </div>
@@ -667,6 +682,46 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
             </div>
           </Dialog>
 
+          <Dialog
+            hidden={this.state.DeleteProjectDetailsDialog}
+            onDismiss={() =>
+              this.setState({
+                DeleteProjectDetailsDialog: true
+              })
+            }
+            dialogContentProps={DeleteProjectDetailsFilterDialogContentProps}
+            modalProps={deletmodelProps}
+            minWidth={500}
+          >
+
+            <div className="DeleteClose-Icon">
+              <div className='delete-text'>
+                {/* <h5 className='confirm-text'>Confirm Deletion</h5> */}
+                <Icon iconName="Cancel" className='confirm-icon' onClick={() => this.setState({ DeleteProjectDetailsDialog: true })}></Icon>
+              </div>
+              <div className="delete-msg">
+                <Icon iconName='Warning' className='Warinig-Ic'></Icon>
+                <p className='mb-0'>Are you sure? <br />Do you really want to delete these record? </p>
+              </div>
+              <div className='Delet-buttons'>
+                <DefaultButton
+                  className="cancel-Icon"
+                  text='Cancel'
+                  iconProps={CancelIcon}
+                  onClick={() => this.setState({ DeleteProjectDetailsDialog: true })}
+                />
+
+                <PrimaryButton
+                  className='delete-icon'
+                  text='Delete'
+                  iconProps={DeleteIcon}
+                  onClick={() => this.DeleteTaskDetails(this.state.DeleteProjectDetailsID)}
+                />
+              </div>
+            </div>
+
+          </Dialog>
+
           {
             this.state.Isloader == true ?
               <>
@@ -696,6 +751,13 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
             </DetailsList>
           </div>
 
+          <div>
+            <div className="ms-Grid-col ms-sm12 ms-md12 ms-lg12 NewsTagGraph">
+              <div style={{ display : 'block', width: '50%', height: '50%' }}>
+                <canvas id="myChart" width="200" height="150"></canvas>
+              </div>
+            </div>
+          </div>
 
         </div>
       </section>
@@ -705,6 +767,7 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
   public async componentDidMount() {
     this.GetProjectDetails();
     this.GetProjectDetailsItem();
+    
   }
 
   public async GetProjectDetails() {
@@ -740,8 +803,11 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
             // Attachments: item.Attachments ? item.Attachments : "",
           });
         });
-        this.setState({ ProjectDetails: AllData, AllProjectListDetails: AllData });
+        this.setState({ ProjectDetails: AllData, AllProjectListDetails: AllData , InProgressCount : AllData.filter(item => item.ProjectStatus === "In Progress").length, CompletedCount : AllData.filter(item => item.ProjectStatus === "Completed").length });
         console.log(this.state.ProjectDetails);
+       
+        this.GetProjectGraph();
+        
       }
     }).catch((error) => {
       console.log("Error fetching project details: ", error);
@@ -750,7 +816,7 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
 
   public async AddProjectDetails() {
 
-    this.setState({ Isloader: true });
+    // this.setState({ Isloader: true });
 
     if (this.state.ProjectName.length == 0) {
       alert("Please enter Project Details");
@@ -768,12 +834,13 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
       const Id = (await projectId).data.ID;
       sp.web.lists.getByTitle("Project Details").items.getById(Id).attachmentFiles.addMultiple(this.state.AllProjectDocuments);
 
-      this.setState({ Isloader: false });
+
       this.setState({ AllProjectDocuments: [] });
       this.setState({ ProjectDetails: projectId });
       this.setState({ ProjectDetailsAddOpenDialog: true });
       this.setState({ TaskFormSection1: true, TaskFormSection2: false, TaskFormSection3: false });
       this.GetProjectDetails();
+      // this.setState({ Isloader: false });
     }
 
   }
@@ -848,7 +915,6 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
       this.setState({ AssignedTo: [] });
       this.setState({ AssignedToID: [] });
     }
-    console.log(this.state.AssignedToID);
   }
 
   public async GetEditProjectDetails(ID) {
@@ -873,24 +939,38 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
   }
 
   public async UpdateProjectDetails(CurrentProjectDetailsID) {
-    const updatedetails = await sp.web.lists.getByTitle("Project Details").items.getById(CurrentProjectDetailsID).update({
-      ProjectName: this.state.EditProjectName,
-      ProjectDescription: this.state.EditProjectDescription,
-      ProjectStartDate: this.state.EditProjectStartDate ,
-      ProjectEndDate: this.state.EditProjectEndDate ,
-      ProjectStatus: this.state.EditProjectStatus,
-      ProjectManager: this.state.EditProjectManager,
-      AssignedTo: this.state.EditAssignedTo ,
-    }).catch((error) => {
-      console.log(error);
-    });
-    this.setState({ ProjectDetails: updatedetails });
+    try {
+      const updateObject: any = {
+        ProjectName: this.state.EditProjectName,
+        ProjectDescription: this.state.EditProjectDescription,
+        ProjectStartDate: this.state.EditProjectStartDate,
+        ProjectEndDate: this.state.EditProjectEndDate,
+        ProjectStatus: this.state.EditProjectStatus,
+        ProjectManager: this.state.EditProjectManager
+      };
+
+      if (this.state.AssignedToID && this.state.AssignedToID.length > 0) {
+        updateObject.AssignedToId = { results: this.state.AssignedToID };
+      }
+
+      const updatedetails = await sp.web.lists
+        .getByTitle("Project Details")
+        .items.getById(CurrentProjectDetailsID)
+        .update(updateObject);
+
+      this.setState({ ProjectDetails: updatedetails });
+
+    } catch (error) {
+      console.error("Error updating project details:", error);
+    }
+
     this.setState({ ProjectDetailsEditOpenDialog: true });
+    this.setState({ TaskFormSection1: true, TaskFormSection2: false });
     this.GetProjectDetails();
   }
 
   public async DeleteTaskDetails(DeleteProjectDetailsID) {
-    const deletetaskdetails = await sp.web.lists.getByTitle("Project Task list").items.getById(DeleteProjectDetailsID).delete();
+    const deletetaskdetails = await sp.web.lists.getByTitle("Project Details").items.getById(DeleteProjectDetailsID).delete();
     this.setState({ ProjectDetails: deletetaskdetails });
     this.setState({ DeleteProjectDetailsDialog: true });
     this.GetProjectDetails();
@@ -901,10 +981,10 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
       let SerchText = Test.toLowerCase();
 
       let filteredData = this.state.AllProjectListDetails.filter((x) => {
-        let CompanyName = x.CompanyName.toLowerCase();
-        let CompanyEmail = x.CompanyEmail.toLowerCase();
+        let ProjectName = x.ProjectName.toLowerCase();
+        let ProjectManager = x.ProjectManager.toLowerCase();
         return (
-          CompanyName.includes(SerchText) || CompanyEmail.includes(SerchText)
+          ProjectName.includes(SerchText) || ProjectManager.includes(SerchText)
         );
       });
 
@@ -913,6 +993,46 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
     else {
       this.setState({ ProjectDetails: this.state.AllProjectListDetails });
     }
+  }
+
+  public async GetProjectGraph() {
+    const statusLabels = ["In Progress", "Completed"];
+    const projects =  [this.state.InProgressCount , this.state.CompletedCount];
+
+    const backgroundColors = [
+      'rgba(255, 99, 132, 0.6)',
+      'rgba(54, 162, 235, 0.6)',
+      'rgba(255, 206, 86, 0.6)',
+      'rgba(75, 192, 192, 0.6)',
+      'rgba(153, 102, 255, 0.6)',
+      'rgba(255, 159, 64, 0.6)'
+    ];
+    const borderColors = backgroundColors.map(color => color.replace("0.6", "1"));
+  
+    if (ctx) {
+      ctx.destroy();
+    }
+  
+    ctx = new Chart("myChart", {
+      type: 'pie',
+      data: {
+        labels: statusLabels,
+        datasets: [{
+          label: 'Project Status',
+          data: projects,
+          backgroundColor: backgroundColors.slice(0, statusLabels.length),
+          borderColor: borderColors.slice(0, statusLabels.length),
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'top' },
+          title: { display: true, text: 'Project Status Distribution' }
+        }
+      }
+    });
   }
 
 }
