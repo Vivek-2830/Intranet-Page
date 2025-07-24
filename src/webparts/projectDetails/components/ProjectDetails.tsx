@@ -260,17 +260,19 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
             <h3>Project Details</h3>
           </div>
 
-          <div className='NewsTagGraph'>
-            <div className="ms-Grid-col ms-sm12 ms-md12 ms-lg12 ">
-              <div style={{ display : 'block', width: '40%', height: '40%' }}>
-                <canvas id="myChart" width="200" height="150"></canvas>
+          <div className='ms-Grid-row'>
+            <div className="ms-Grid-col ms-sm12 ms-md12 ms-lg4">
+              <div className='NewsTagGraph'>
+                <h4 className='graphName'>Project Status</h4>
+                <div className='graph'>
+                  <canvas id="myChart"></canvas> 
+                </div>
               </div>
             </div>
           </div>
-
-          <div className='ms-Grid-row'>
-            <div className='filedGroup'>
-
+          
+          <div className='filedGroup'>
+            <div className='ms-Grid-row'>
               <div className='ms-Grid-col ms-sm5 ms-md4 ms-lg2'>
                 <SearchBox placeholder="Search" className="new-search"
                   onChange={(e) => { this.applyVendorFilters(e.target.value); }}
@@ -749,14 +751,6 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
               checkButtonAriaLabel="select row"
             >
             </DetailsList>
-          </div>
-
-          <div>
-            <div className="ms-Grid-col ms-sm12 ms-md12 ms-lg12 NewsTagGraph">
-              <div style={{ display : 'block', width: '50%', height: '50%' }}>
-                <canvas id="myChart" width="200" height="150"></canvas>
-              </div>
-            </div>
           </div>
 
         </div>
