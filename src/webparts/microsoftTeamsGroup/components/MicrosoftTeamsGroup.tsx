@@ -21,6 +21,7 @@ import {
   TooltipHost
 } from 'office-ui-fabric-react';
 import { PeoplePicker, PrincipalType } from "@pnp/spfx-controls-react/lib/PeoplePicker";
+import * as moment from 'moment';
 // import { SelectTeamPicker } from "@pnp/spfx-controls-react/lib/TeamPicker";
 
 
@@ -127,9 +128,9 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
       EndDate: "",
       ProjectManagerID: "",
       ProjectManager: "",
-      Status: "",
-      AssignedTo: "",
-      AssignedToID: "",
+      Status: [],
+      AssignedTo: [],
+      AssignedToID: [],
       ProjectNameID: "",
       ProjectName: "",
       Statuslist: [],
@@ -146,10 +147,10 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
       EditProjectManagerID: "",
       EditProjectManager: "",
       EditStatus: "",
-      EditAssignedTo: "",
+      EditAssignedTo: [],
       EditProjectNameID: "",
       EditProjectName: "",
-      EditAssignedToID: "",
+      EditAssignedToID: [],
       EditTaskDialogOpen: true,
       DeleteTaskDialogOpen: true,
       CurrentTaskDetailsID : "",
@@ -182,7 +183,10 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
         fieldName: "StartDate",
         minWidth: 130,
         maxWidth: 130,
-        isResizable: false
+        isResizable: false,
+        onRender: (item) => {
+          return <span>{moment(new Date(item.StartDate)).format("DD-MM-YYYY")}</span>;
+        }
       },
       {
         key: "ProjectManager",
@@ -193,9 +197,9 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
         isResizable: false
       },
       {
-        key: "ProjectID",
+        key: "ProjectName",
         name: "ProjectName",
-        fieldName: "ProjectID",
+        fieldName: "ProjectName",
         minWidth: 150,
         maxWidth: 150,
         isResizable: false
@@ -210,11 +214,16 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
       },
       {
         key: "AssignedTo",
-        name: "AssignedTo",
+        name: "Assigned To",
         fieldName: "AssignedTo",
         minWidth: 150,
         maxWidth: 150,
-        isResizable: false
+        isResizable: false,
+        // onRender: (item) => {
+        //   return <span>
+        //     {item.AssignedTo && item.AssignedTo.length > 0 ? item.AssignedTo.map(member => member.Title) : ''}
+        //   </span>;
+        // }
       },
       {
         key: "Actions",
@@ -295,7 +304,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
                 EndDate: "",
                 ProjectManagerID: "",
                 Status: "",
-                AssignedTo: "",
+                AssignedTo: [],
                 ProjectNameID: "",
                 AddTaskDialogOpen: true,
                 TaskFormSection1: true,
@@ -446,10 +455,11 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
                                             placeholder='Select Assigned To'
                                             showtooltip={true}
                                             required={true}
-                                            defaultSelectedUsers={[this.state.AssignedTo.Title]}
+                                            // defaultSelectedUsers={[this.state.AssignedTo.Title]}
                                             onChange={(e) =>
                                                this.setState({ AssignedToID: e[0].id, AssignedTo: e[0].text })
                                             }
+                                            // onChange={this._getPeoplePickerItems}
                                             principalTypes={[PrincipalType.User]}
                                             resolveDelay={300}
                                             ensureUser={true}
@@ -486,20 +496,23 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
             hidden={this.state.EditTaskDialogOpen}
             onDismiss={() =>
               this.setState({
+                EditTaskDialogOpen: true,
                 EditTaskName: "",
                 EditDescription: "",
                 EditStartDate: "",
                 EditEndDate: "",
                 EditProjectManagerID: "",
-                EditStatus: "",
+                EditStatus: [],
                 EditAssignedTo: "",
                 EditProjectNameID: "",
-                EditTaskDialogOpen: true,
                 TaskFormSection1: true,
                 TaskFormSection2: false,
                 TaskFormSection3: false
               })
             }
+            dialogContentProps={UpdateTaskDetailsDialogContentProps}
+            modalProps={updatemodelProps}
+            minWidth={500}
           >
             <div className='ms-Grid-row'>
 
@@ -516,6 +529,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
                             onChange={(value) =>
                               this.setState({ EditTaskName: value.target["value"] })
                             }
+                            value={this.state.EditTaskName}
                           />
                         </div>
                       </div>
@@ -530,6 +544,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
                             onChange={(value) =>
                               this.setState({ EditDescription: value.target["value"] })
                             }
+                            value={this.state.EditDescription}
                           />
                         </div>
                       </div>
@@ -640,7 +655,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
                                               placeholder='Select Assigned To'
                                               showtooltip={true}
                                               required={true}
-                                              defaultSelectedUsers={[this.state.EditAssignedTo.Title]}
+                                              defaultSelectedUsers={this.state.EditAssignedTo.EMail}
                                               onChange={(e) =>
                                                 this.setState({ EditAssignedToID: e[0].id, EditAssignedTo: e[0].text })
                                               }
@@ -740,10 +755,11 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
     );
   }
 
-  public async componenettDidMount() {
+  public async componentDidMount() {
     this.GetTaskDetailsItems();
     this.GetTaskdetailsStatusItems();
-    // this._getPeoplePickerItems;
+    this.GetProjectManagerDetailsItem();
+    this.GetProjectNameDetailsItem();
   }
 
   public async GetTaskDetailsItems() {
@@ -758,6 +774,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
       "Status",
       "AssignedTo/Title",
       "AssignedTo/Id",
+      "AssignedTo/EMail",
       "ProjectName/ID",
       "ProjectName/ProjectName"
     ).expand("AssignedTo", "ProjectName", "ProjectManager").get().then((data) => {
@@ -776,7 +793,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
             ProjectManagerId: item.ProjectManager ? item.ProjectManager.ID : "",
             ProjectManager: item.ProjectManager ? item.ProjectManager.ProjectManager : "",
             Status: item.Status ? item.Status : "",
-            AssignedTo: item.AssignedTo ? item.AssignedTo.Title : "",
+            AssignedTo: item.AssignedTo ? item.AssignedTo : "",
             ProjectNameId: item.ProjectName ? item.ProjectName.ID : "",
             ProjectName: item.ProjectName ? item.ProjectName.ProjectName : ""
           });
@@ -809,7 +826,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
   }
 
   public async AddTaskDetails() {
-    if (this.state.TaskName.length = 0) {
+    if (this.state.TaskName.length == 0) {
       alert("Please enter task name");
     }
     else {
@@ -821,37 +838,37 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
         Status: this.state.Status,
         ProjectNameId: this.state.ProjectNameID,
         ProjectManagerId: this.state.ProjectManagerID,
-        AssignedToId: this.state.AssignedToID
+        AssignedToId: this.state.AssignedToID 
       }).catch((error) => {
         console.log("Can't add a new task", error);
       });
-
       this.GetTaskDetailsItems();
       this.setState({ TaskDetailsData: addtaskdetails });
       this.setState({ AddTaskDialogOpen: true });
       this.setState({ TaskFormSection1: true, TaskFormSection2: false, TaskFormSection3: false });
+      
     }
   }
 
   public async GetEditTaskDetails(ID) {
-    let Edittaskdetails = this.state.TaskDetailsData.filter((item) => {
+    let EditTaskDetails = this.state.TaskDetailsData.filter((item) => {
       if (item.ID == ID) {
         return item;
       }
     });
-    console.log(Edittaskdetails);
+    console.log(EditTaskDetails);
     this.setState({
-      EditTaskName: Edittaskdetails[0].TaskName,
-      EditDescription: Edittaskdetails[0].Description,
-      EditStartDate: Edittaskdetails[0].StartDate,
-      EditEndDate: Edittaskdetails[0].EndDate,
-      EditProjectManagerID: Edittaskdetails[0].ProjectManagerId,
-      // EditProjectManager: Edittaskdetails[0].ProjectManager,
-      EditStatus: Edittaskdetails[0].Status,
-      EditAssignedTo: Edittaskdetails[0].AssignedTo,
-      EditProjectNameID: Edittaskdetails[0].ProjectNameId,
-      // EditProjectName: Edittaskdetails[0].ProjectName,
-      // EditAssignedToID: Edittaskdetails[0].AssignedToID
+      EditTaskName: EditTaskDetails[0].TaskName,
+      EditDescription: EditTaskDetails[0].Description,
+      EditStartDate: new Date(EditTaskDetails[0].StartDate),
+      EditEndDate: new Date(EditTaskDetails[0].EndDate),
+      EditProjectManagerID: EditTaskDetails[0].ProjectManagerId,
+      // EditProjectManager: EditTaskDetails[0].ProjectManager,
+      EditStatus: EditTaskDetails[0].Status,
+      EditAssignedTo: EditTaskDetails[0].AssignedTo,
+      EditProjectNameID: EditTaskDetails[0].ProjectNameId,
+      // EditProjectName: EditTaskDetails[0].ProjectName,
+      // EditAssignedToID: EditTaskDetails[0].AssignedToID
     });
 
   }
@@ -870,8 +887,8 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
       console.log(error);
     });
     this.GetTaskDetailsItems();
-    this.setState({ EditTaskDialogOpen: true });
     this.setState({ TaskDetailsData: updatetaskdetails });
+    this.setState({ EditTaskDialogOpen: true });
     this.setState({ TaskFormSection1: true, TaskFormSection2: false, TaskFormSection3: false });
   }
 
@@ -882,52 +899,62 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
     this.GetTaskDetailsItems();
   }
 
+  public async GetProjectManagerDetailsItem() {
+    const detailsItem = await sp.web.lists.getByTitle("Project Details").items.select(
+      "ID",
+      "ProjectManager",
+      "ProjectName"
+    ).get().then((data) => {
+      let detailsData = [];
+      data.forEach(function(dname, i) {
+        detailsData.push({ key: dname.ID, text: dname.ProjectManager });
+      });
+      this.setState({ ProjectManagerlist : detailsData });
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+  }
+
+  public async GetProjectNameDetailsItem() {
+    const detailsItem = await sp.web.lists.getByTitle("Project Details").items.select(
+      "ID",
+      "ProjectName"
+    ).get().then((data) => {
+      let detailsData = [];
+      data.forEach(function(dname, i) {
+        detailsData.push({ key: dname.ID, text: dname.ProjectName });
+      });
+      this.setState({ ProjectNamelist : detailsData });
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+  }
+
   public async GetTaskdetailsStatusItems() {
     const choieFieldName1 = "Status";
     const field1 = await sp.web.lists.getByTitle("Project Task list").fields.getByInternalNameOrTitle(choieFieldName1)();
     let status = [];
     field1["Choices"].forEach(function (dname, i) {
-      status.push({ key: dname, text: i });
+      status.push({ key: dname, text: dname });
     });
     this.setState({ Statuslist: status });
-
-    const choiceFieldName2 = "ProjectManager";
-    const field2 = await sp.web.lists.getByTitle("Project Task list").fields.getByInternalNameOrTitle(choiceFieldName2)();
-    let projectManager = [];
-    field2["Choices"].forEach(function (dname, i) {
-      projectManager.push({ key: dname, text: i });
-    });
-    this.setState({ ProjectManagerlist: projectManager });
-
-    const choiceFieldName3 = "ProjectName";
-    const field3 = await sp.web.lists.getByTitle("Project Task list").fields.getByInternalNameOrTitle(choiceFieldName3)();
-    let projectName = [];
-    field3["Choices"].forEach(function (dname, i) {
-      projectName.push({ key: dname, text: i });
-    });
-    this.setState({ ProjectNamelist: projectName });
   }
 
   public _getPeoplePickerItems = async (items: any[]) => {
+
     if (items.length > 0) {
-      const assigneto = items.map(item => item.text);
-      const assignetoID = items.map(item => item.id);
-      this.setState({ AssignedTo: assigneto });
-      this.setState({ AssignedToID: assignetoID });
+
+      const memberNames = items.map(item => item.text);
+      const memberIDs = items.map(item => item.id);
+      this.setState({ AssignedTo: memberNames });
+      this.setState({ AssignedToID: memberIDs });
     }
     else {
       this.setState({ AssignedTo: [] });
       this.setState({ AssignedToID: [] });
     }
   }
-
-  // public async handleProjectName(SelectedProjectName) {
-  //   let project = this.state.TaskDetailsData;
-  //   const selectedProjectname = project.filter((item) => {
-  //     if (item.ProjectID == SelectedProjectName) {
-  //       return item;
-  //     }
-  //   })
-  // }
 
 }

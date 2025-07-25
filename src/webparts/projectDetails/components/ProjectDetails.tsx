@@ -265,7 +265,7 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
               <div className='NewsTagGraph'>
                 <h4 className='graphName'>Project Status</h4>
                 <div className='graph'>
-                  <canvas id="myChart"></canvas> 
+                  <canvas id="myChart" width="200"></canvas> 
                 </div>
               </div>
             </div>
