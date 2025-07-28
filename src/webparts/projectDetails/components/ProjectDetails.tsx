@@ -230,7 +230,9 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
                   <div className='ProjectAction-Icon'>
 
                     <div className='Read-Icon'>
-                      <Icon iconName='View' className='Read-project'></Icon>
+                      <a href={this.props.context.pageContext._web.absoluteUrl + '/SitePages/Task-Details.aspx?RequestID=' + item.ID} target="_blank" data-interception="off">
+                        <Icon iconName="View" className='read-doc'></Icon>
+                      </a>
                     </div>
 
                     <div className='Edit-Icon'>
@@ -761,7 +763,6 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
   public async componentDidMount() {
     this.GetProjectDetails();
     this.GetProjectDetailsItem();
-    
   }
 
   public async GetProjectDetails() {

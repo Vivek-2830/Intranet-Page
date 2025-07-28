@@ -63,6 +63,7 @@ export interface IMicrosoftTeamsGroupState {
   DeleteTaskDialogOpen: boolean;
   CurrentTaskDetailsID : any;
   DeleteTaskDetailsID : any;
+  requesID : any;
 }
 
 
@@ -119,7 +120,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
     super(props);
 
     this.state = {
-      TaskDetailsData: [],
+      TaskDetailsData:"",
       AddTaskDialogOpen: true,
       AllTaskListDetails: [],
       TaskName: "",
@@ -154,7 +155,8 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
       EditTaskDialogOpen: true,
       DeleteTaskDialogOpen: true,
       CurrentTaskDetailsID : "",
-      DeleteTaskDetailsID : ""
+      DeleteTaskDetailsID : "",
+      requesID : ""
     };
 
   }
@@ -198,7 +200,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
       },
       {
         key: "ProjectName",
-        name: "ProjectName",
+        name: "Project Name",
         fieldName: "ProjectName",
         minWidth: 150,
         maxWidth: 150,
@@ -219,10 +221,32 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
         minWidth: 150,
         maxWidth: 150,
         isResizable: false,
-        // onRender: (item) => {
-        //   return <span>
-        //     {item.AssignedTo && item.AssignedTo.length > 0 ? item.AssignedTo.map(member => member.Title) : ''}
-        //   </span>;
+        onRender: (item) => {
+          return <span>
+            {item.AssignedTo && item.AssignedTo.length > 0
+              ? item.AssignedTo.map(member => member.Title).join(', ')
+              : ''}
+          </span>;
+        }
+        // {item.AssignedTo.Title || ''}
+        //  onRender: (item) => {
+        //   return (
+        //     <span>
+        //       {Array.isArray(item.AssignedTo) ? (
+        //         item.AssignedTo.map((member, index) => (
+        //           <div key={index}>
+        //             <p>{member.Title}</p>
+        //           </div>
+        //         ))
+        //       ) : item.AssignedTo ? (
+        //         <div>
+        //           <p>{item.AssignedTo.Title}</p>
+        //         </div>
+        //       ) : (
+        //         ""
+        //       )}
+        //     </span>
+        //   );
         // }
       },
       {
@@ -305,6 +329,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
                 ProjectManagerID: "",
                 Status: "",
                 AssignedTo: [],
+                AssignedToID : [],
                 ProjectNameID: "",
                 AddTaskDialogOpen: true,
                 TaskFormSection1: true,
@@ -451,15 +476,15 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
                                           <PeoplePicker
                                             context={this.props.context}
                                             titleText="Assigned To:"
-                                            personSelectionLimit={1}
+                                            personSelectionLimit={3}
                                             placeholder='Select Assigned To'
                                             showtooltip={true}
                                             required={true}
                                             // defaultSelectedUsers={[this.state.AssignedTo.Title]}
-                                            onChange={(e) =>
-                                               this.setState({ AssignedToID: e[0].id, AssignedTo: e[0].text })
-                                            }
-                                            // onChange={this._getPeoplePickerItems}
+                                            // onChange={(e) =>
+                                            //    this.setState({ AssignedToID: e[0].id, AssignedTo: e[0].text })
+                                            // }
+                                            onChange={this._getPeoplePickerItems}
                                             principalTypes={[PrincipalType.User]}
                                             resolveDelay={300}
                                             ensureUser={true}
@@ -655,10 +680,11 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
                                               placeholder='Select Assigned To'
                                               showtooltip={true}
                                               required={true}
-                                              defaultSelectedUsers={this.state.EditAssignedTo.EMail}
-                                              onChange={(e) =>
-                                                this.setState({ EditAssignedToID: e[0].id, EditAssignedTo: e[0].text })
-                                              }
+                                              defaultSelectedUsers={this.state.EditAssignedTo}
+                                              // onChange={(e) =>
+                                              //   this.setState({ EditAssignedToID: e[0].id, EditAssignedTo: e[0].text })
+                                              // }
+                                              onChange={this._getPeoplePickerItems}
                                               principalTypes={[PrincipalType.User]}
                                               resolveDelay={300}
                                               ensureUser={true}
@@ -760,6 +786,21 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
     this.GetTaskdetailsStatusItems();
     this.GetProjectManagerDetailsItem();
     this.GetProjectNameDetailsItem();
+    this.GetTaskDetails();
+  }
+
+  public async GetTaskDetails() {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const requestid = urlParams.get('RequestID');
+      if(requestid) {
+        this.setState({ requesID : requestid });
+      } else {
+        console.log("RequestID not found in URL parameters.");
+      }
+    } catch (error) {
+      console.log("Error parsing URL Parameters: "  , error);
+    }
   }
 
   public async GetTaskDetailsItems() {
@@ -772,8 +813,8 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
       "ProjectManager/ID",
       "ProjectManager/ProjectManager",
       "Status",
-      "AssignedTo/Title",
       "AssignedTo/Id",
+      "AssignedTo/Title",
       "AssignedTo/EMail",
       "ProjectName/ID",
       "ProjectName/ProjectName"
@@ -838,7 +879,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
         Status: this.state.Status,
         ProjectNameId: this.state.ProjectNameID,
         ProjectManagerId: this.state.ProjectManagerID,
-        AssignedToId: this.state.AssignedToID 
+        AssignedToId: {results : this.state.AssignedToID} 
       }).catch((error) => {
         console.log("Can't add a new task", error);
       });
@@ -865,7 +906,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
       EditProjectManagerID: EditTaskDetails[0].ProjectManagerId,
       // EditProjectManager: EditTaskDetails[0].ProjectManager,
       EditStatus: EditTaskDetails[0].Status,
-      EditAssignedTo: EditTaskDetails[0].AssignedTo,
+      EditAssignedTo: EditTaskDetails[0].AssignedTo.map(item => item.EMail),
       EditProjectNameID: EditTaskDetails[0].ProjectNameId,
       // EditProjectName: EditTaskDetails[0].ProjectName,
       // EditAssignedToID: EditTaskDetails[0].AssignedToID
@@ -874,22 +915,33 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
   }
 
   public async UpateTaskDetails(CurrentTaskDetailsID) {
-    const updatetaskdetails = await sp.web.lists.getByTitle("Project Task list").items.getById(CurrentTaskDetailsID).update({
-      TaskName: this.state.EditTaskName,
-      Description: this.state.EditDescription,
-      StartDate: this.state.EditStartDate,
-      EndDate: this.state.EditEndDate,
-      Status: this.state.EditStatus,
-      ProjectNameId: this.state.EditProjectNameID,
-      ProjectManagerId: this.state.EditProjectManagerID,
-      AssignedToId: this.state.EditAssignedToID
-    }).catch((error) => {
-      console.log(error);
-    });
+    try {
+      const updatetaskdetails : any = {
+        TaskName: this.state.EditTaskName,
+        Description: this.state.EditDescription,
+        StartDate: this.state.EditStartDate,
+        EndDate: this.state.EditEndDate,
+        Status: this.state.EditStatus,
+        ProjectNameId: this.state.EditProjectNameID,
+        ProjectManagerId: this.state.EditProjectManagerID,
+      };
+      
+      if(this.state.AssignedToID && this.state.AssignedToID.length > 0) {
+        updatetaskdetails.AssignedToId = { results : this.state.AssignedToID };
+      }
+
+      const updatedetails = await sp.web.lists.getByTitle("Project Task list").items.getById(CurrentTaskDetailsID).update(updatetaskdetails);
+
+      this.setState({ TaskDetailsData : updatedetails });
+
+    } catch(error) {
+      console.log("Error updating task details: ", error);
+    }
+
     this.GetTaskDetailsItems();
-    this.setState({ TaskDetailsData: updatetaskdetails });
     this.setState({ EditTaskDialogOpen: true });
     this.setState({ TaskFormSection1: true, TaskFormSection2: false, TaskFormSection3: false });
+    
   }
 
   public async DeleteTaskDetails(DeleteTaskDetailsID) {
@@ -899,11 +951,33 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
     this.GetTaskDetailsItems();
   }
 
+  // publzic async GetProjectManagerDetailsItem() {
+  //   try {
+  //     const data = await sp.web.lists.getByTitle("Project Details").items
+  //       .select("ID", "ProjectManager")
+  //       .get();
+  
+  //     const uniqueNames = new Set<string>();
+  //     const detailsData: { key: number, text: string }[] = [];
+  
+  //     data.forEach((d) => {
+  //       if (d.ProjectManager && !uniqueNames.has(d.ProjectManager)) {
+  //         uniqueNames.add(d.ProjectManager);
+  //         detailsData.push({ key: d.ID, text: d.ProjectManager });
+  //       }
+  //     });
+  
+  //     this.setState({ ProjectManagerlist: detailsData });
+  //   } catch (error) {
+  //     console.error("Error fetching project manager details:", error);
+  //   }
+  // }
+  
+
   public async GetProjectManagerDetailsItem() {
     const detailsItem = await sp.web.lists.getByTitle("Project Details").items.select(
       "ID",
-      "ProjectManager",
-      "ProjectName"
+      "ProjectManager"
     ).get().then((data) => {
       let detailsData = [];
       data.forEach(function(dname, i) {
