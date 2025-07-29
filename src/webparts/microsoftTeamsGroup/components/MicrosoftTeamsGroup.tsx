@@ -63,7 +63,8 @@ export interface IMicrosoftTeamsGroupState {
   DeleteTaskDialogOpen: boolean;
   CurrentTaskDetailsID : any;
   DeleteTaskDetailsID : any;
-  requesID : any;
+  requestID : any;
+  ProjectDetailsData : any;
 }
 
 
@@ -156,7 +157,8 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
       DeleteTaskDialogOpen: true,
       CurrentTaskDetailsID : "",
       DeleteTaskDetailsID : "",
-      requesID : ""
+      requestID : "",
+      ProjectDetailsData : ""
     };
 
   }
@@ -421,7 +423,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
                                     label="Project Manager"
                                     required
                                     onChange={(e, option, text) =>
-                                      this.setState({ ProjectManager: option.text, ProjectManagerID: option.key })
+                                      this.setState({ ProjectManager: option.text , ProjectManagerID : option.key})
                                     }
                                   />
                                 </div>
@@ -435,7 +437,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
                                     label="Project Name"
                                     required
                                     onChange={(e, option, text) =>
-                                      this.setState({ ProjectName: option.text, ProjectNameID: option.key })
+                                      this.setState({ ProjectName: option.text , ProjectNameID: option.key })
                                     }
                                   />
                                 </div>
@@ -782,10 +784,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
   }
 
   public async componentDidMount() {
-    this.GetTaskDetailsItems();
     this.GetTaskdetailsStatusItems();
-    this.GetProjectManagerDetailsItem();
-    this.GetProjectNameDetailsItem();
     this.GetTaskDetails();
   }
 
@@ -794,7 +793,10 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
       const urlParams = new URLSearchParams(window.location.search);
       const requestid = urlParams.get('RequestID');
       if(requestid) {
-        this.setState({ requesID : requestid });
+        this.setState({ requestID : requestid });
+        this.GetTaskDetailsItems(requestid);
+        this.GetProjectNameDetailsItem(requestid);
+        this.GetProjectManagerDetailsItem(requestid);
       } else {
         console.log("RequestID not found in URL parameters.");
       }
@@ -803,7 +805,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
     }
   }
 
-  public async GetTaskDetailsItems() {
+  public async GetTaskDetailsItems(ID) {
     const tasks = await sp.web.lists.getByTitle("Project Task list").items.select(
       "ID",
       "TaskName",
@@ -817,8 +819,9 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
       "AssignedTo/Title",
       "AssignedTo/EMail",
       "ProjectName/ID",
-      "ProjectName/ProjectName"
-    ).expand("AssignedTo", "ProjectName", "ProjectManager").get().then((data) => {
+      "ProjectName/ProjectName",
+      "RequestID/Id"
+    ).expand("AssignedTo", "ProjectName", "ProjectManager","RequestID").filter(`RequestID/Id eq ${ID}`).get().then((data) => {
       let AllData = [];
       console.log(data);
       console.log(tasks);
@@ -836,7 +839,8 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
             Status: item.Status ? item.Status : "",
             AssignedTo: item.AssignedTo ? item.AssignedTo : "",
             ProjectNameId: item.ProjectName ? item.ProjectName.ID : "",
-            ProjectName: item.ProjectName ? item.ProjectName.ProjectName : ""
+            ProjectName: item.ProjectName ? item.ProjectName.ProjectName : "",
+            // RequestID: item.RequestID ? item.RequestID.Id : "",
           });
         });
         this.setState({ TaskDetailsData: AllData, AllTaskListDetails: AllData });
@@ -877,13 +881,14 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
         StartDate: this.state.StartDate,
         EndDate: this.state.EndDate,
         Status: this.state.Status,
-        ProjectNameId: this.state.ProjectNameID,
-        ProjectManagerId: this.state.ProjectManagerID,
-        AssignedToId: {results : this.state.AssignedToID} 
+        ProjectName: this.state.ProjectNameID,
+        ProjectManager: this.state.ProjectManagerID,
+        AssignedToId: {results : this.state.AssignedToID}
       }).catch((error) => {
         console.log("Can't add a new task", error);
       });
-      this.GetTaskDetailsItems();
+      
+      this.GetTaskDetailsItems(this.state.requestID);
       this.setState({ TaskDetailsData: addtaskdetails });
       this.setState({ AddTaskDialogOpen: true });
       this.setState({ TaskFormSection1: true, TaskFormSection2: false, TaskFormSection3: false });
@@ -938,7 +943,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
       console.log("Error updating task details: ", error);
     }
 
-    this.GetTaskDetailsItems();
+    this.GetTaskDetailsItems(this.state.requestID);
     this.setState({ EditTaskDialogOpen: true });
     this.setState({ TaskFormSection1: true, TaskFormSection2: false, TaskFormSection3: false });
     
@@ -948,7 +953,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
     const deletetaskdetails = await sp.web.lists.getByTitle("Project Task list").items.getById(DeleteTaskDetailsID).delete();
     this.setState({ TaskDetailsData: deletetaskdetails });
     this.setState({ DeleteTaskDialogOpen: true });
-    this.GetTaskDetailsItems();
+    this.GetTaskDetailsItems(this.state.requestID);
   }
 
   // publzic async GetProjectManagerDetailsItem() {
@@ -973,37 +978,38 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
   //   }
   // }
   
+  public async GetProjectManagerDetailsItem(ID) {
+    try {
+      const data = await sp.web.lists.getByTitle("Project Details").items.select(
+        "ID",
+        "ProjectManager"
+      ).getById(ID).get();
 
-  public async GetProjectManagerDetailsItem() {
-    const detailsItem = await sp.web.lists.getByTitle("Project Details").items.select(
-      "ID",
-      "ProjectManager"
-    ).get().then((data) => {
-      let detailsData = [];
-      data.forEach(function(dname, i) {
-        detailsData.push({ key: dname.ID, text: dname.ProjectManager });
-      });
-      this.setState({ ProjectManagerlist : detailsData });
-    })
-    .catch((error) => {
+      const detailsItem = [];
+      detailsItem.push({ key: data.ID, text: data.ProjectManager });
+      console.log("Project Manager Details: ", detailsItem);
+      this.setState({ ProjectManagerlist: detailsItem });
+
+    } catch(error) {
       console.log(error);
-    });
+    }
   }
 
-  public async GetProjectNameDetailsItem() {
-    const detailsItem = await sp.web.lists.getByTitle("Project Details").items.select(
-      "ID",
-      "ProjectName"
-    ).get().then((data) => {
-      let detailsData = [];
-      data.forEach(function(dname, i) {
-        detailsData.push({ key: dname.ID, text: dname.ProjectName });
-      });
-      this.setState({ ProjectNamelist : detailsData });
-    })
-    .catch((error) => {
+  public async GetProjectNameDetailsItem(ID) {
+    try {
+      const data = await sp.web.lists.getByTitle("Project Details").items
+        .select("ID", "ProjectName")
+        .getById(ID)
+        .get();
+  
+      const detailsData = [];
+      detailsData.push({ key: data.ID, text: data.ProjectName });
+      console.log("Project Manager Details: ", detailsData);
+      this.setState({ ProjectNamelist: detailsData });
+  
+    } catch (error) {
       console.log(error);
-    });
+    }
   }
 
   public async GetTaskdetailsStatusItems() {
