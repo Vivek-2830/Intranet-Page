@@ -191,3 +191,96 @@
 }
 
 .mb-0{color: black;}
+
+
+
+
+
+.Status-box {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.Status {
+    background-color: rgb(243,244,246,1);
+    border-radius: 8px;
+    padding: 16px;
+    width: 219px;
+    height: 217px;
+}
+
+.InProgress-Title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 16px;
+}
+
+.Inprogress-card {
+    background-color: white;
+    border-radius: 4px;
+    padding: 16px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+    height: 95px;
+    width: 183px;
+}
+
+.card-title {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 1px;
+    margin-top: 1px;
+}
+
+.Inprogress-card p{
+    margin: 0px;
+    line-height: 1.25rem;
+    font-weight: 400;
+}
+
+.badge-low {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 14px;
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.badge-medium {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 14px;
+    background-color: #fef9c3;
+    color: #92400e;
+}
+
+.badge-high {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 14px;
+    background-color: #fee2e2;
+    color: #b91c1c;
+}
+
+.Status-wrapper::-webkit-scrollbar {
+    width: 10px;
+}
+
+.Status-wrapper{
+    height: 95px !important;
+    overflow-y: scroll;
+}
+
+.Status-wrapper::-webkit-scrollbar-track {
+    /* background: #f1f1f1; */
+}

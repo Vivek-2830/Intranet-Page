@@ -4,6 +4,7 @@ import { IMicrosoftTeamsGroupProps } from './IMicrosoftTeamsGroupProps';
 import { escape } from '@microsoft/sp-lodash-subset';
 import { sp } from '@pnp/sp';
 import {
+  AutoScroll,
   constructKeytip,
   DatePicker,
   DefaultButton,
@@ -22,6 +23,9 @@ import {
 } from 'office-ui-fabric-react';
 import { PeoplePicker, PrincipalType } from "@pnp/spfx-controls-react/lib/PeoplePicker";
 import * as moment from 'moment';
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 // import { SelectTeamPicker } from "@pnp/spfx-controls-react/lib/TeamPicker";
 
 
@@ -42,6 +46,8 @@ export interface IMicrosoftTeamsGroupState {
   ProjectName: any;
   AssignedToID: any;
   Statuslist: any;
+  Priority: any;
+  Prioritylist: any;
   TaskFormSection1: boolean;
   TaskFormSection2: boolean;
   TaskFormSection3: boolean;
@@ -55,16 +61,17 @@ export interface IMicrosoftTeamsGroupState {
   EditProjectManagerID: any;
   EditProjectManager: any;
   EditStatus: any;
+  EditPriority: any;
   EditAssignedTo: any;
   EditProjectNameID: any;
   EditProjectName: any;
   EditAssignedToID: any;
   EditTaskDialogOpen: boolean;
   DeleteTaskDialogOpen: boolean;
-  CurrentTaskDetailsID : any;
-  DeleteTaskDetailsID : any;
-  requestID : any;
-  ProjectDetailsData : any;
+  CurrentTaskDetailsID: any;
+  DeleteTaskDetailsID: any;
+  requestID: any;
+  ProjectDetailsData: any;
 }
 
 
@@ -121,7 +128,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
     super(props);
 
     this.state = {
-      TaskDetailsData:"",
+      TaskDetailsData: "",
       AddTaskDialogOpen: true,
       AllTaskListDetails: [],
       TaskName: "",
@@ -136,6 +143,8 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
       ProjectNameID: "",
       ProjectName: "",
       Statuslist: [],
+      Priority: "",
+      Prioritylist: [],
       TaskFormSection1: true,
       TaskFormSection2: false,
       TaskFormSection3: false,
@@ -149,16 +158,17 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
       EditProjectManagerID: "",
       EditProjectManager: "",
       EditStatus: "",
+      EditPriority: "",
       EditAssignedTo: [],
       EditProjectNameID: "",
       EditProjectName: "",
       EditAssignedToID: [],
       EditTaskDialogOpen: true,
       DeleteTaskDialogOpen: true,
-      CurrentTaskDetailsID : "",
-      DeleteTaskDetailsID : "",
-      requestID : "",
-      ProjectDetailsData : ""
+      CurrentTaskDetailsID: "",
+      DeleteTaskDetailsID: "",
+      requestID: "",
+      ProjectDetailsData: ""
     };
 
   }
@@ -171,6 +181,34 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
       hasTeamsContext,
       userDisplayName
     } = this.props;
+
+
+    var settings = {
+      dots: true,
+      infinite: true,
+      speed: 500,
+      slidesToShow: 1,
+      slidesToScroll: 1,
+      autoplaySpeed: 2000,
+      autoplay: true,
+      cssEase: "linear",
+      // nextArrow: <SampleNextArrow />,
+      // prevArrow: <SamplePrevArrow />
+    };
+
+    function SampleNextArrow(props) {
+      const { className, style, onClick } = props;
+      return (
+        <img className={className + " arrow-img-icon"} src={require("../assets/Image/next.jpg")} style={{ ...style }} onClick={onClick} />
+      );
+    }
+
+    function SamplePrevArrow(props) {
+      const { className, style, onClick } = props;
+      return (
+        <img className={className + " arrow-img-icon"} src={require("../assets/Image/back.jpg")} style={{ ...style }} onClick={onClick} />
+      );
+    }
 
     const columns: IColumn[] = [
       {
@@ -270,11 +308,11 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
                     </div>
 
                     <div className='Edit-Icon'>
-                      <Icon className='Edit-Icon' iconName="Edit" onClick={() => this.setState({EditTaskDialogOpen : false , CurrentTaskDetailsID : item.ID }, () => this.GetEditTaskDetails(item.ID))}></Icon>
+                      <Icon className='Edit-Icon' iconName="Edit" onClick={() => this.setState({ EditTaskDialogOpen: false, CurrentTaskDetailsID: item.ID }, () => this.GetEditTaskDetails(item.ID))}></Icon>
                     </div>
 
                     <div className='Delete-Icon'>
-                      <Icon className='icon' iconName="Delete" onClick={() => this.setState({ DeleteTaskDialogOpen : false , DeleteTaskDetailsID: item.ID })}></Icon>
+                      <Icon className='icon' iconName="Delete" onClick={() => this.setState({ DeleteTaskDialogOpen: false, DeleteTaskDetailsID: item.ID })}></Icon>
                     </div>
 
                   </div>
@@ -296,6 +334,115 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
           <div className='Task-Header'>
             <h3>Task Details</h3>
           </div>
+
+          <div className='ms-Grid-row'>
+            <div className='ms-Grid-col ms-sm12 ms-md12 ms-lg12'>
+              <div className='Status-box'>
+                {
+                  this.state.TaskDetailsData.length > 0 &&
+                  this.state.TaskDetailsData.map((item) => {
+                    return (
+                      item.Status == "To Do" ?
+                        <>
+                          <div className='Status-kit'>
+                            <div className='Status'>
+                              <h2 className='InProgress-Title'>To Do</h2>
+
+                              <div className='Inprogress-card Status-wrapper'>
+                                <h3 className="card-title">{item.TaskName}</h3>
+                                <p>{item.Description}</p>
+                                {
+                                  item.Priority == "Low" ?
+                                    <>
+                                      <span className="badge-low">{item.Priority}</span>
+                                    </>
+                                    :
+                                    <>
+                                      {
+                                        item.Priority == "Medium" ?
+                                          <>
+                                            <span className="badge-medium">{item.Priority}</span>
+                                          </>
+                                          :
+                                          <>
+                                            {
+                                              item.Priority == "High" ?
+                                                <>
+                                                  <span className="badge-high">{item.Priority}</span>
+                                                </>
+                                                :
+                                                <></>
+                                            }
+                                          </>
+                                      }
+                                    </>
+                                }
+
+                              </div>
+                            </div>
+
+                          </div>
+                        </>
+                        :
+                        <>
+                          {
+                            item.Status == "In Progress" ?
+                              <>
+                                <div className='Status-Kit'>
+                                  <div className='Status'>
+                                    <h2 className='InProgress-Title'>In Progress</h2>
+
+                                    <div className='Inprogress-card Status-wrapper'>
+                                      <h3 className="card-title">{item.TaskName}</h3>
+                                      <p>{item.Description}</p>
+                                      {
+                                        item.Priority == "Low" ?
+                                          <>
+                                            <span className="badge-low">{item.Priority}</span>
+                                          </>
+                                          :
+                                          <>
+                                            {
+                                              item.Priority == "Medium" ?
+                                                <>
+                                                  <span className="badge-medium">{item.Priority}</span>
+                                                </>
+                                                :
+                                                <>
+                                                  {
+                                                    item.Priority == "High" ?
+                                                      <>
+                                                        <span className="badge-high">{item.Priority}</span>
+                                                      </>
+                                                      :
+                                                      <></>
+                                                  }
+                                                </>
+                                            }
+                                          </>
+                                      }
+                                    </div>
+                                  </div>
+                                </div>
+                              </>
+                              :
+                              <>
+
+                              </>
+                          }
+                        </>
+
+
+
+                    );
+                  })
+
+                }
+              </div>
+            </div>
+          </div>
+
+          <br />
 
           <div className='ms-Grid-row'>
             <div className='Task-Group'>
@@ -330,8 +477,9 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
                 EndDate: "",
                 ProjectManagerID: "",
                 Status: "",
+                Priority: "",
                 AssignedTo: [],
-                AssignedToID : [],
+                AssignedToID: [],
                 ProjectNameID: "",
                 AddTaskDialogOpen: true,
                 TaskFormSection1: true,
@@ -415,7 +563,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
                         {
                           this.state.TaskFormSection2 == true ?
                             <>
-                              <div className='ms-Grid-col ms-sm12 ms-md12 ms-lg12'>
+                              <div className='ms-Grid-col ms-sm6 ms-md6 ms-lg6'>
                                 <div className='add-ProjectManager'>
                                   <Dropdown
                                     options={this.state.ProjectManagerlist}
@@ -423,13 +571,13 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
                                     label="Project Manager"
                                     required
                                     onChange={(e, option, text) =>
-                                      this.setState({ ProjectManager: option.text , ProjectManagerID : option.key})
+                                      this.setState({ ProjectManager: option.text, ProjectManagerID: option.key })
                                     }
                                   />
                                 </div>
                               </div>
 
-                              <div className='ms-Grid-col ms-sm12 ms-md12 ms-lg12'>
+                              <div className='ms-Grid-col ms-sm6 ms-md6 ms-lg6'>
                                 <div className='add-ProjectName'>
                                   <Dropdown
                                     options={this.state.ProjectNamelist}
@@ -437,13 +585,13 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
                                     label="Project Name"
                                     required
                                     onChange={(e, option, text) =>
-                                      this.setState({ ProjectName: option.text , ProjectNameID: option.key })
+                                      this.setState({ ProjectName: option.text, ProjectNameID: option.key })
                                     }
                                   />
                                 </div>
                               </div>
 
-                              <div className='ms-Grid-col ms-sm12 ms-md12 ms-lg12'>
+                              <div className='ms-Grid-col ms-sm6 ms-md6 ms-lg6'>
                                 <div className='add-Status'>
                                   <Dropdown
                                     options={this.state.Statuslist}
@@ -452,6 +600,20 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
                                     required
                                     onChange={(e, option, text) =>
                                       this.setState({ Status: option.text })
+                                    }
+                                  />
+                                </div>
+                              </div>
+
+                              <div className='ms-Grid-col ms-sm6 ms-md6 ms-lg6'>
+                                <div className="add-Priority">
+                                  <Dropdown
+                                    options={this.state.Prioritylist}
+                                    placeholder='Select Your Task Priority'
+                                    label='Task Priority'
+                                    required
+                                    onChange={(e, option, text) =>
+                                      this.setState({ Priority: option.text })
                                     }
                                   />
                                 </div>
@@ -495,12 +657,24 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
                                       </div>
 
                                       <div className='ms-Grid-col ms-sm12 ms-md12 ms-lg12'>
-                                        <div className='Submit-TaskDetails'>
-                                          <PrimaryButton
-                                            className='Save-Details'
-                                            text="Submit"
-                                            onClick={() => this.AddTaskDetails()}
-                                          />
+                                        <div className='Add-TaskDetails'>
+                                          <div className='Submit-TaskDetails'>
+                                            <PrimaryButton
+                                              className='Save-Details'
+                                              text="Submit"
+                                              onClick={() => this.AddTaskDetails()}
+                                            />
+                                          </div>
+
+                                          <div className='Cancel-Project'>
+                                            <DefaultButton
+                                              iconProps={CancelIcon}
+                                              text="Cancel"
+                                              onClick={() =>
+                                                this.setState({ AddTaskDialogOpen: true, TaskFormSection1: true, TaskFormSection2: false, TaskFormSection3: false })
+                                              }
+                                            />
+                                          </div>
                                         </div>
                                       </div>
 
@@ -530,6 +704,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
                 EditEndDate: "",
                 EditProjectManagerID: "",
                 EditStatus: [],
+                EditPriority: [],
                 EditAssignedTo: "",
                 EditProjectNameID: "",
                 TaskFormSection1: true,
@@ -613,7 +788,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
                         {
                           this.state.TaskFormSection2 == true ?
                             <>
-                              <div className='ms-Grid-col ms-sm12 ms-md12 ms-lg12'>
+                              <div className='ms-Grid-col ms-sm6 ms-md6 ms-lg6'>
                                 <div className='edit-ProjectManager'>
                                   <Dropdown
                                     options={this.state.ProjectManagerlist}
@@ -628,7 +803,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
                                 </div>
                               </div>
 
-                              <div className='ms-Grid-col ms-sm12 ms-md12 ms-lg12'>
+                              <div className='ms-Grid-col ms-sm6 ms-md6 ms-lg6'>
                                 <div className='add-ProjectName'>
                                   <Dropdown
                                     options={this.state.ProjectNamelist}
@@ -643,7 +818,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
                                 </div>
                               </div>
 
-                              <div className='ms-Grid-col ms-sm12 ms-md12 ms-lg12'>
+                              <div className='ms-Grid-col ms-sm6 ms-md6 ms-lg6'>
                                 <div className='add-Status'>
                                   <Dropdown
                                     options={this.state.Statuslist}
@@ -653,6 +828,21 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
                                     defaultSelectedKey={this.state.EditStatus}
                                     onChange={(e, option, text) =>
                                       this.setState({ EditStatus: option.text })
+                                    }
+                                  />
+                                </div>
+                              </div>
+
+                              <div className='ms-Grid-col ms-sm6 ms-md6 ms-lg6'>
+                                <div className='add-Priority'>
+                                  <Dropdown
+                                    options={this.state.Prioritylist}
+                                    placeholder='Select Your Task Priority'
+                                    label='Task Priority'
+                                    required
+                                    defaultSelectedKey={this.state.EditPriority}
+                                    onChange={(e, option, text) =>
+                                      this.setState({ EditPriority: option.text })
                                     }
                                   />
                                 </div>
@@ -670,44 +860,44 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
                             :
                             <>
                               <div>
-                                  {
-                                    this.state.TaskFormSection3 == true ?
-                                      <>
-                                        <div className='ms-Grid-col ms-sm12 ms-md12 ms-lg12'>
-                                          <div className='edit-AssignedTo'>
-                                            <PeoplePicker
-                                              context={this.props.context}
-                                              titleText="Assigned To:"
-                                              personSelectionLimit={1}
-                                              placeholder='Select Assigned To'
-                                              showtooltip={true}
-                                              required={true}
-                                              defaultSelectedUsers={this.state.EditAssignedTo}
-                                              // onChange={(e) =>
-                                              //   this.setState({ EditAssignedToID: e[0].id, EditAssignedTo: e[0].text })
-                                              // }
-                                              onChange={this._getPeoplePickerItems}
-                                              principalTypes={[PrincipalType.User]}
-                                              resolveDelay={300}
-                                              ensureUser={true}
-                                            />
-                                          </div>
+                                {
+                                  this.state.TaskFormSection3 == true ?
+                                    <>
+                                      <div className='ms-Grid-col ms-sm12 ms-md12 ms-lg12'>
+                                        <div className='edit-AssignedTo'>
+                                          <PeoplePicker
+                                            context={this.props.context}
+                                            titleText="Assigned To:"
+                                            personSelectionLimit={1}
+                                            placeholder='Select Assigned To'
+                                            showtooltip={true}
+                                            required={true}
+                                            defaultSelectedUsers={this.state.EditAssignedTo}
+                                            // onChange={(e) =>
+                                            //   this.setState({ EditAssignedToID: e[0].id, EditAssignedTo: e[0].text })
+                                            // }
+                                            onChange={this._getPeoplePickerItems}
+                                            principalTypes={[PrincipalType.User]}
+                                            resolveDelay={300}
+                                            ensureUser={true}
+                                          />
                                         </div>
+                                      </div>
 
-                                        <div className='ms-Grid-col ms-sm12 ms-md12 ms-lg12'>
-                                          <div className='Submit-TaskDetails'>
-                                            <PrimaryButton
-                                              className='Save-Details'
-                                              text="Update Task Details"
-                                              onClick={() => this.UpateTaskDetails(this.state.CurrentTaskDetailsID)}
-                                            />
-                                          </div>
+                                      <div className='ms-Grid-col ms-sm12 ms-md12 ms-lg12'>
+                                        <div className='Submit-TaskDetails'>
+                                          <PrimaryButton
+                                            className='Save-Details'
+                                            text="Update Task Details"
+                                            onClick={() => this.UpateTaskDetails(this.state.CurrentTaskDetailsID)}
+                                          />
                                         </div>
+                                      </div>
 
-                                      </>
-                                      :
-                                      <></>
-                                  }
+                                    </>
+                                    :
+                                    <></>
+                                }
                               </div>
                             </>
                         }
@@ -721,42 +911,42 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
           </Dialog>
 
           <Dialog
-          hidden={this.state.DeleteTaskDialogOpen}
-          onDismiss={() =>
-            this.setState({
-              DeleteTaskDialogOpen: true
-            })
-          }
-          dialogContentProps={DeleteTaskDetailsFilterDialogContentProps}
-          modalProps={deletmodelProps}
-          minWidth={500}
-        >
+            hidden={this.state.DeleteTaskDialogOpen}
+            onDismiss={() =>
+              this.setState({
+                DeleteTaskDialogOpen: true
+              })
+            }
+            dialogContentProps={DeleteTaskDetailsFilterDialogContentProps}
+            modalProps={deletmodelProps}
+            minWidth={500}
+          >
 
-          <div className="DeleteClose-Icon">
-            <div className='delete-text'>
-              {/* <h5 className='confirm-text'>Confirm Deletion</h5> */}
-              <Icon iconName="Cancel" className='confirm-icon' onClick={() => this.setState({ DeleteTaskDialogOpen: true })}></Icon>
-            </div>
-            <div className="delete-msg">
-              <Icon iconName='Warning' className='Warinig-Ic'></Icon>
-              <p className='mb-0'>Are you sure? <br />Do you really want to delete these record? </p>
-            </div>
-            <div className='Delet-buttons'>
-              <DefaultButton
-                className="cancel-Icon"
-                text='Cancel'
-                iconProps={CancelIcon}
-                onClick={() => this.setState({ DeleteTaskDialogOpen: true })}
-              />
+            <div className="DeleteClose-Icon">
+              <div className='delete-text'>
+                {/* <h5 className='confirm-text'>Confirm Deletion</h5> */}
+                <Icon iconName="Cancel" className='confirm-icon' onClick={() => this.setState({ DeleteTaskDialogOpen: true })}></Icon>
+              </div>
+              <div className="delete-msg">
+                <Icon iconName='Warning' className='Warinig-Ic'></Icon>
+                <p className='mb-0'>Are you sure? <br />Do you really want to delete these record? </p>
+              </div>
+              <div className='Delet-buttons'>
+                <DefaultButton
+                  className="cancel-Icon"
+                  text='Cancel'
+                  iconProps={CancelIcon}
+                  onClick={() => this.setState({ DeleteTaskDialogOpen: true })}
+                />
 
-              <PrimaryButton
-                className='delete-icon'
-                text='Delete'
-                iconProps={DeleteIcon}
-                onClick={() => this.DeleteTaskDetails(this.state.DeleteTaskDetailsID)}
-              />
+                <PrimaryButton
+                  className='delete-icon'
+                  text='Delete'
+                  iconProps={DeleteIcon}
+                  onClick={() => this.DeleteTaskDetails(this.state.DeleteTaskDetailsID)}
+                />
+              </div>
             </div>
-          </div>
 
           </Dialog>
 
@@ -792,8 +982,8 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
     try {
       const urlParams = new URLSearchParams(window.location.search);
       const requestid = urlParams.get('RequestID');
-      if(requestid) {
-        this.setState({ requestID : requestid });
+      if (requestid) {
+        this.setState({ requestID: requestid });
         this.GetTaskDetailsItems(requestid);
         this.GetProjectNameDetailsItem(requestid);
         this.GetProjectManagerDetailsItem(requestid);
@@ -801,7 +991,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
         console.log("RequestID not found in URL parameters.");
       }
     } catch (error) {
-      console.log("Error parsing URL Parameters: "  , error);
+      console.log("Error parsing URL Parameters: ", error);
     }
   }
 
@@ -815,13 +1005,14 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
       "ProjectManager/ID",
       "ProjectManager/ProjectManager",
       "Status",
+      "Priority",
       "AssignedTo/Id",
       "AssignedTo/Title",
       "AssignedTo/EMail",
       "ProjectName/ID",
       "ProjectName/ProjectName",
-      "RequestID/Id"
-    ).expand("AssignedTo", "ProjectName", "ProjectManager","RequestID").filter(`RequestID/Id eq ${ID}`).get().then((data) => {
+      "RequestID/Id",
+    ).expand("AssignedTo", "ProjectName", "ProjectManager", "RequestID").filter(`RequestID/Id eq ${ID}`).get().then((data) => {
       let AllData = [];
       console.log(data);
       console.log(tasks);
@@ -837,14 +1028,16 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
             ProjectManagerId: item.ProjectManager ? item.ProjectManager.ID : "",
             ProjectManager: item.ProjectManager ? item.ProjectManager.ProjectManager : "",
             Status: item.Status ? item.Status : "",
+            Priority: item.Priority ? item.Priority : "",
             AssignedTo: item.AssignedTo ? item.AssignedTo : "",
             ProjectNameId: item.ProjectName ? item.ProjectName.ID : "",
             ProjectName: item.ProjectName ? item.ProjectName.ProjectName : "",
-            // RequestID: item.RequestID ? item.RequestID.Id : "",
+            RequestID: item.RequestID ? item.RequestID.Id : "",
           });
         });
         this.setState({ TaskDetailsData: AllData, AllTaskListDetails: AllData });
         console.log(this.state.TaskDetailsData);
+        console.log("Request ID :", this.state.requestID);
       }
     }).catch((error) => {
       console.log("Error while fetching task details: ", error);
@@ -881,18 +1074,19 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
         StartDate: this.state.StartDate,
         EndDate: this.state.EndDate,
         Status: this.state.Status,
-        ProjectName: this.state.ProjectNameID,
-        ProjectManager: this.state.ProjectManagerID,
-        AssignedToId: {results : this.state.AssignedToID}
+        ProjectNameId: this.state.ProjectNameID,
+        ProjectManagerId: this.state.ProjectManagerID,
+        AssignedToId: { results: this.state.AssignedToID },
+        RequestIDId: this.state.requestID
       }).catch((error) => {
         console.log("Can't add a new task", error);
       });
-      
+
       this.GetTaskDetailsItems(this.state.requestID);
       this.setState({ TaskDetailsData: addtaskdetails });
       this.setState({ AddTaskDialogOpen: true });
       this.setState({ TaskFormSection1: true, TaskFormSection2: false, TaskFormSection3: false });
-      
+
     }
   }
 
@@ -911,6 +1105,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
       EditProjectManagerID: EditTaskDetails[0].ProjectManagerId,
       // EditProjectManager: EditTaskDetails[0].ProjectManager,
       EditStatus: EditTaskDetails[0].Status,
+      EditPriority: EditTaskDetails[0].Priority,
       EditAssignedTo: EditTaskDetails[0].AssignedTo.map(item => item.EMail),
       EditProjectNameID: EditTaskDetails[0].ProjectNameId,
       // EditProjectName: EditTaskDetails[0].ProjectName,
@@ -921,32 +1116,33 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
 
   public async UpateTaskDetails(CurrentTaskDetailsID) {
     try {
-      const updatetaskdetails : any = {
+      const updatetaskdetails: any = {
         TaskName: this.state.EditTaskName,
         Description: this.state.EditDescription,
         StartDate: this.state.EditStartDate,
         EndDate: this.state.EditEndDate,
         Status: this.state.EditStatus,
+        Priority: this.state.EditPriority,
         ProjectNameId: this.state.EditProjectNameID,
         ProjectManagerId: this.state.EditProjectManagerID,
       };
-      
-      if(this.state.AssignedToID && this.state.AssignedToID.length > 0) {
-        updatetaskdetails.AssignedToId = { results : this.state.AssignedToID };
+
+      if (this.state.AssignedToID && this.state.AssignedToID.length > 0) {
+        updatetaskdetails.AssignedToId = { results: this.state.AssignedToID };
       }
 
       const updatedetails = await sp.web.lists.getByTitle("Project Task list").items.getById(CurrentTaskDetailsID).update(updatetaskdetails);
 
-      this.setState({ TaskDetailsData : updatedetails });
+      this.setState({ TaskDetailsData: updatedetails });
 
-    } catch(error) {
+    } catch (error) {
       console.log("Error updating task details: ", error);
     }
 
     this.GetTaskDetailsItems(this.state.requestID);
     this.setState({ EditTaskDialogOpen: true });
     this.setState({ TaskFormSection1: true, TaskFormSection2: false, TaskFormSection3: false });
-    
+
   }
 
   public async DeleteTaskDetails(DeleteTaskDetailsID) {
@@ -961,23 +1157,23 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
   //     const data = await sp.web.lists.getByTitle("Project Details").items
   //       .select("ID", "ProjectManager")
   //       .get();
-  
+
   //     const uniqueNames = new Set<string>();
   //     const detailsData: { key: number, text: string }[] = [];
-  
+
   //     data.forEach((d) => {
   //       if (d.ProjectManager && !uniqueNames.has(d.ProjectManager)) {
   //         uniqueNames.add(d.ProjectManager);
   //         detailsData.push({ key: d.ID, text: d.ProjectManager });
   //       }
   //     });
-  
+
   //     this.setState({ ProjectManagerlist: detailsData });
   //   } catch (error) {
   //     console.error("Error fetching project manager details:", error);
   //   }
   // }
-  
+
   public async GetProjectManagerDetailsItem(ID) {
     try {
       const data = await sp.web.lists.getByTitle("Project Details").items.select(
@@ -990,7 +1186,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
       console.log("Project Manager Details: ", detailsItem);
       this.setState({ ProjectManagerlist: detailsItem });
 
-    } catch(error) {
+    } catch (error) {
       console.log(error);
     }
   }
@@ -1001,12 +1197,12 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
         .select("ID", "ProjectName")
         .getById(ID)
         .get();
-  
+
       const detailsData = [];
       detailsData.push({ key: data.ID, text: data.ProjectName });
-      console.log("Project Manager Details: ", detailsData);
+      console.log("Project Name: ", detailsData);
       this.setState({ ProjectNamelist: detailsData });
-  
+
     } catch (error) {
       console.log(error);
     }
@@ -1020,6 +1216,14 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
       status.push({ key: dname, text: dname });
     });
     this.setState({ Statuslist: status });
+
+    const choiceFieldName2 = "Priority";
+    const field2 = await sp.web.lists.getByTitle("Project Task list").fields.getByInternalNameOrTitle(choiceFieldName2)();
+    let priority = [];
+    field2["Choices"].forEach(function (dname, i) {
+      priority.push({ key: dname, text: dname });
+    });
+    this.setState({ Prioritylist: priority });
   }
 
   public _getPeoplePickerItems = async (items: any[]) => {
@@ -1038,3 +1242,112 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
   }
 
 }
+
+
+
+// <div className='ms-Grid-row'>
+//             <div className='ms-Grid-col ms-sm12 ms-md12 ms-lg12'>
+//               <div className='Status-box'>
+//                 {
+//                   this.state.TaskDetailsData.length > 0 &&
+//                   this.state.TaskDetailsData.map((item) => {
+//                     return (
+//                       item.Status == "To Do" ?
+//                         <>
+//                           <div className='Status-kit'>
+//                             <div className='Status'>
+//                               <h2 className='InProgress-Title'>To Do</h2>
+
+//                               <div className='Inprogress-card Status-wrapper'>
+//                                 <h3 className="card-title">{item.TaskName}</h3>
+//                                 <p>{item.Description}</p>
+//                                 {
+//                                   item.Priority == "Low" ?
+//                                     <>
+//                                       <span className="badge-low">{item.Priority}</span>
+//                                     </>
+//                                     :
+//                                     <>
+//                                       {
+//                                         item.Priority == "Medium" ?
+//                                           <>
+//                                             <span className="badge-medium">{item.Priority}</span>
+//                                           </>
+//                                           :
+//                                           <>
+//                                             {
+//                                               item.Priority == "High" ?
+//                                                 <>
+//                                                   <span className="badge-high">{item.Priority}</span>
+//                                                 </>
+//                                                 :
+//                                                 <></>
+//                                             }
+//                                           </>
+//                                       }
+//                                     </>
+//                                 }
+
+//                               </div>
+//                             </div>
+
+//                           </div>
+//                         </>
+//                         :
+//                         <>
+//                           {
+//                             item.Status == "In Progress" ?
+//                               <>
+//                                 <div className='Status-Kit'>
+//                                   <div className='Status'>
+//                                     <h2 className='InProgress-Title'>In Progress</h2>
+
+//                                     <div className='Inprogress-card Status-wrapper'>
+//                                       <h3 className="card-title">{item.TaskName}</h3>
+//                                       <p>{item.Description}</p>
+//                                       {
+//                                         item.Priority == "Low" ?
+//                                           <>
+//                                             <span className="badge-low">{item.Priority}</span>
+//                                           </>
+//                                           :
+//                                           <>
+//                                             {
+//                                               item.Priority == "Medium" ?
+//                                                 <>
+//                                                   <span className="badge-medium">{item.Priority}</span>
+//                                                 </>
+//                                                 :
+//                                                 <>
+//                                                   {
+//                                                     item.Priority == "High" ?
+//                                                       <>
+//                                                         <span className="badge-high">{item.Priority}</span>
+//                                                       </>
+//                                                       :
+//                                                       <></>
+//                                                   }
+//                                                 </>
+//                                             }
+//                                           </>
+//                                       }
+//                                     </div>
+//                                   </div>
+//                                 </div>
+//                               </>
+//                               :
+//                               <>
+
+//                               </>
+//                           }
+//                         </>
+
+
+
+//                     );
+//                   })
+
+//                 }
+//               </div>
+//             </div>
+// </div>
