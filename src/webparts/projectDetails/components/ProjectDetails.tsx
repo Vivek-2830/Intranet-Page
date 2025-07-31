@@ -169,8 +169,8 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
         key: "ProjectName",
         name: "Project Name",
         fieldName: "ProjectName",
-        minWidth: 100,
-        maxWidth: 200,
+        minWidth: 130,
+        maxWidth: 130,
         isResizable: false,
       },
       {
@@ -180,13 +180,23 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
         minWidth: 100,
         maxWidth: 200,
         isResizable: false,
+        onRender: (item) => {
+          return (
+            <div 
+              style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }} 
+              title={item.ProjectDescription} // Tooltip with full description
+            >
+              {item.ProjectDescription}
+            </div>
+          );
+        }
       },
       {
         key: "ProjectStartDate",
         name: "ProjectStartDate",
         fieldName: "ProjectStartDate",
-        minWidth: 100,
-        maxWidth: 200,
+        minWidth: 130,
+        maxWidth: 130,
         isResizable: false,
         onRender: (item) => {
           return <span>{moment(new Date(item.ProjectStartDate)).format("DD-MM-YYYY")}</span>;
@@ -196,16 +206,24 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
         key: "ProjectManager",
         name: "Project Manager",
         fieldName: "ProjectManager",
-        minWidth: 100,
-        maxWidth: 200,
+        minWidth: 150,
+        maxWidth: 150,
         isResizable: false,
+      },
+      {
+        key: "ProjectStatus",
+        name: "Project Status",
+        fieldName: "ProjectStatus",
+        minWidth: 150,
+        maxWidth: 150,
+        isResizable: false
       },
       {
         key: "AssignedTo",
         name: "Assigned To",
         fieldName: "AssignedTo",
-        minWidth: 100,
-        maxWidth: 200,
+        minWidth: 150,
+        maxWidth: 150,
         isResizable: false,
         onRender: (item) => {
           return <span>
@@ -220,7 +238,7 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
         name: "Actions",
         fieldName: "Actions",
         minWidth: 150,
-        maxWidth: 150,
+        maxWidth: 100,
         isResizable: false,
         onRender: (item) => {
           return (
@@ -640,7 +658,6 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
                                 <div className='Project-Submit'>
                                   <div className='Add-Submit'>
                                     <PrimaryButton
-                                      iconProps={SendIcon}
                                       text="Update"
                                       onClick={() => this.UpdateProjectDetails(this.state.CurrentProjectDetailsID)}
                                     />
@@ -648,7 +665,6 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
 
                                   <div className='Cancel-Project'>
                                     <DefaultButton
-                                      iconProps={CancelIcon}
                                       text="Cancel"
                                       onClick={() =>
                                         this.setState({ ProjectDetailsEditOpenDialog: true, TaskFormSection1: true, TaskFormSection2: false })

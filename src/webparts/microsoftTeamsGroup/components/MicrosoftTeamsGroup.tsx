@@ -32,6 +32,7 @@ import "slick-carousel/slick/slick-theme.css";
 
 export interface IMicrosoftTeamsGroupState {
   TaskDetailsData: any;
+  ProjectDetails : any;
   AddTaskDialogOpen: boolean;
   AllTaskListDetails: any;
   TaskName: any;
@@ -129,6 +130,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
 
     this.state = {
       TaskDetailsData: "",
+      ProjectDetails : "",
       AddTaskDialogOpen: true,
       AllTaskListDetails: [],
       TaskName: "",
@@ -181,34 +183,6 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
       hasTeamsContext,
       userDisplayName
     } = this.props;
-
-
-    var settings = {
-      dots: true,
-      infinite: true,
-      speed: 500,
-      slidesToShow: 1,
-      slidesToScroll: 1,
-      autoplaySpeed: 2000,
-      autoplay: true,
-      cssEase: "linear",
-      // nextArrow: <SampleNextArrow />,
-      // prevArrow: <SamplePrevArrow />
-    };
-
-    function SampleNextArrow(props) {
-      const { className, style, onClick } = props;
-      return (
-        <img className={className + " arrow-img-icon"} src={require("../assets/Image/next.jpg")} style={{ ...style }} onClick={onClick} />
-      );
-    }
-
-    function SamplePrevArrow(props) {
-      const { className, style, onClick } = props;
-      return (
-        <img className={className + " arrow-img-icon"} src={require("../assets/Image/back.jpg")} style={{ ...style }} onClick={onClick} />
-      );
-    }
 
     const columns: IColumn[] = [
       {
@@ -332,43 +306,43 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
         <div className='ms-Grid'>
 
           <div className='Task-Header'>
-            <h3>Task Details</h3>
+            <h3> {this.state.ProjectDetails ? this.state.ProjectDetails[0].ProjectName : ""} Task Details</h3>
           </div>
 
           <div className='ms-Grid-row'>
             <div className='ms-Grid-col ms-sm12 ms-md12 ms-lg12'>
               <div className='Status-box'>
-                {
-                  this.state.TaskDetailsData.length > 0 &&
-                  this.state.TaskDetailsData.map((item) => {
-                    return (
-                      item.Status == "To Do" ?
-                        <>
-                          <div className='Status-kit'>
-                            <div className='Status'>
-                              <h2 className='InProgress-Title'>To Do</h2>
 
-                              <div className='Inprogress-card Status-wrapper'>
+                <div className='Status-Kit'>
+                  <div className='Status'>
+                    <h2 className='InProgress-Title'>To Do</h2>
+                    <div className='Status-wrapper'>
+                      {
+                        this.state.TaskDetailsData.length > 0 &&
+                        this.state.TaskDetailsData.filter((item) => item.Status == "To Do").map((item) => {
+                          return (
+                            <>
+                              <div className='Inprogress-card' key={item.ID}>
                                 <h3 className="card-title">{item.TaskName}</h3>
                                 <p>{item.Description}</p>
                                 {
                                   item.Priority == "Low" ?
                                     <>
-                                      <span className="badge-low">{item.Priority}</span>
+                                      <span className='badge-low'>{item.Priority}</span>
                                     </>
                                     :
                                     <>
                                       {
                                         item.Priority == "Medium" ?
                                           <>
-                                            <span className="badge-medium">{item.Priority}</span>
+                                            <span className='badge-medium'>{item.Priority}</span>
                                           </>
                                           :
                                           <>
                                             {
                                               item.Priority == "High" ?
                                                 <>
-                                                  <span className="badge-high">{item.Priority}</span>
+                                                  <span className='badge-high'>{item.Priority}</span>
                                                 </>
                                                 :
                                                 <></>
@@ -377,71 +351,161 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
                                       }
                                     </>
                                 }
-
                               </div>
-                            </div>
+                            </>
+                          );
+                        })
+                      }
+                    </div>
+                  </div>
+                </div>
 
-                          </div>
-                        </>
-                        :
-                        <>
-                          {
-                            item.Status == "In Progress" ?
-                              <>
-                                <div className='Status-Kit'>
-                                  <div className='Status'>
-                                    <h2 className='InProgress-Title'>In Progress</h2>
-
-                                    <div className='Inprogress-card Status-wrapper'>
-                                      <h3 className="card-title">{item.TaskName}</h3>
-                                      <p>{item.Description}</p>
+                <div className='Status-Kit'>
+                  <div className='Status'>
+                    <h2 className='InProgress-Title'>In Progress</h2>
+                    <div className='Status-wrapper'>
+                      {
+                        this.state.TaskDetailsData.length > 0 &&
+                        this.state.TaskDetailsData.filter((item) => item.Status == "In Progress").map((item) => {
+                          return (
+                            <>
+                              <div className='Inprogress-card' key={item.ID}>
+                                <h3 className="card-title">{item.TaskName}</h3>
+                                <p>{item.Description}</p>
+                                {
+                                  item.Priority == "Low" ?
+                                    <>
+                                      <span className='badge-low'>{item.Priority}</span>
+                                    </>
+                                    :
+                                    <>
                                       {
-                                        item.Priority == "Low" ?
+                                        item.Priority == "Medium" ?
                                           <>
-                                            <span className="badge-low">{item.Priority}</span>
+                                            <span className='badge-medium'>{item.Priority}</span>
                                           </>
                                           :
                                           <>
                                             {
-                                              item.Priority == "Medium" ?
+                                              item.Priority == "High" ?
                                                 <>
-                                                  <span className="badge-medium">{item.Priority}</span>
+                                                  <span className='badge-high'>{item.Priority}</span>
                                                 </>
                                                 :
-                                                <>
-                                                  {
-                                                    item.Priority == "High" ?
-                                                      <>
-                                                        <span className="badge-high">{item.Priority}</span>
-                                                      </>
-                                                      :
-                                                      <></>
-                                                  }
-                                                </>
+                                                <></>
                                             }
                                           </>
                                       }
-                                    </div>
-                                  </div>
-                                </div>
-                              </>
-                              :
-                              <>
+                                    </>
+                                }
+                              </div>
+                            </>
+                          );
+                        })
+                      }
+                    </div>
+                  </div>
+                </div>
 
-                              </>
-                          }
-                        </>
+                <div className='Status-Kit'>
+                  <div className='Status'>
+                    <h2 className='InProgress-Title'>Ready For QA</h2>
+                    <div className='Status-wrapper'>
+                      {
+                        this.state.TaskDetailsData.length > 0 &&
+                        this.state.TaskDetailsData.filter((item) => item.Status == "Ready For QA").map((item) => {
+                          return (
+                            <>
+                              <div className='Inprogress-card' key={item.ID}>
+                                <h3 className="card-title">{item.TaskName}</h3>
+                                <p>{item.Description}</p>
+                                {
+                                  item.Priority == "Low" ?
+                                    <>
+                                      <span className='badge-low'>{item.Priority}</span>
+                                    </>
+                                    :
+                                    <>
+                                      {
+                                        item.Priority == "Medium" ?
+                                          <>
+                                            <span className='badge-medium'>{item.Priority}</span>
+                                          </>
+                                          :
+                                          <>
+                                            {
+                                              item.Priority == "High" ?
+                                                <>
+                                                  <span className='badge-high'>{item.Priority}</span>
+                                                </>
+                                                :
+                                                <></>
+                                            }
+                                          </>
+                                      }
+                                    </>
+                                }
+                              </div>
+                            </>
+                          );
+                        })
+                      }
+                    </div>
+                  </div>
+                </div>
 
+                <div className='Status-Kit'>
+                  <div className='Status'>
+                    <h2 className='InProgress-Title'>Completed</h2>
+                    <div className='Status-wrapper'>
+                      {
+                        this.state.TaskDetailsData.length > 0 &&
+                        this.state.TaskDetailsData.filter((item) => item.Status == "Completed").map((item) => {
+                          return (
+                            <>
+                              <div className='Inprogress-card' key={item.ID}>
+                                <h3 className="card-title">{item.TaskName}</h3>
+                                <p>{item.Description}</p>
+                                {
+                                  item.Priority == "Low" ?
+                                    <>
+                                      <span className='badge-low'>{item.Priority}</span>
+                                    </>
+                                    :
+                                    <>
+                                      {
+                                        item.Priority == "Medium" ?
+                                          <>
+                                            <span className='badge-medium'>{item.Priority}</span>
+                                          </>
+                                          :
+                                          <>
+                                            {
+                                              item.Priority == "High" ?
+                                                <>
+                                                  <span className='badge-high'>{item.Priority}</span>
+                                                </>
+                                                :
+                                                <></>
+                                            }
+                                          </>
+                                      }
+                                    </>
+                                }
+                              </div>
+                            </>
+                          );
+                        })
+                      }
+                    </div>
+                  </div>
+                </div>
 
-
-                    );
-                  })
-
-                }
               </div>
             </div>
           </div>
 
+          <br />
           <br />
 
           <div className='ms-Grid-row'>
@@ -657,10 +721,10 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
                                       </div>
 
                                       <div className='ms-Grid-col ms-sm12 ms-md12 ms-lg12'>
-                                        <div className='Add-TaskDetails'>
+                                        <div className='Task-Submit'>
                                           <div className='Submit-TaskDetails'>
                                             <PrimaryButton
-                                              className='Save-Details'
+                                              iconProps={SendIcon}
                                               text="Submit"
                                               onClick={() => this.AddTaskDetails()}
                                             />
@@ -885,13 +949,25 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
                                       </div>
 
                                       <div className='ms-Grid-col ms-sm12 ms-md12 ms-lg12'>
-                                        <div className='Submit-TaskDetails'>
-                                          <PrimaryButton
-                                            className='Save-Details'
-                                            text="Update Task Details"
-                                            onClick={() => this.UpateTaskDetails(this.state.CurrentTaskDetailsID)}
-                                          />
+                                        <div className='Task-Submit'>
+                                          <div className='Submit-TaskDetails'>
+                                            <PrimaryButton
+                                              className='Save-Details'
+                                              text="Update Tasks "
+                                              onClick={() => this.UpateTaskDetails(this.state.CurrentTaskDetailsID)}
+                                            />
+                                          </div>
+
+                                          <div className='Cancel-Project'>
+                                            <DefaultButton
+                                              text="Cancel"
+                                              onClick={() =>
+                                                this.setState({ EditTaskDialogOpen: true, TaskFormSection1: true, TaskFormSection2: false })
+                                              }
+                                            />
+                                          </div>
                                         </div>
+
                                       </div>
 
                                     </>
@@ -987,6 +1063,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
         this.GetTaskDetailsItems(requestid);
         this.GetProjectNameDetailsItem(requestid);
         this.GetProjectManagerDetailsItem(requestid);
+        this.GetProjectDetails(requestid);
       } else {
         console.log("RequestID not found in URL parameters.");
       }
@@ -1241,113 +1318,25 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
     }
   }
 
+  public async GetProjectDetails(ID) {
+
+    try {
+      const projectdetails = await sp.web.lists.getByTitle("Project Details").items.select(
+        "ID",
+        "ProjectName",
+        "ProjectDescription",
+        "ProjectStartDate",
+        "ProjectEndDate",
+        "ProjectStatus",
+        "ProjectManager",
+        "AssignedTo/Id",
+        "AssignedTo/Title",
+        "AssignedTo/EMail"
+        // "Attachments"
+      ).expand("AssignedTo").filter(`Id eq ${ID}`).get();
+      this.setState({ ProjectDetails: projectdetails });
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }
-
-
-
-// <div className='ms-Grid-row'>
-//             <div className='ms-Grid-col ms-sm12 ms-md12 ms-lg12'>
-//               <div className='Status-box'>
-//                 {
-//                   this.state.TaskDetailsData.length > 0 &&
-//                   this.state.TaskDetailsData.map((item) => {
-//                     return (
-//                       item.Status == "To Do" ?
-//                         <>
-//                           <div className='Status-kit'>
-//                             <div className='Status'>
-//                               <h2 className='InProgress-Title'>To Do</h2>
-
-//                               <div className='Inprogress-card Status-wrapper'>
-//                                 <h3 className="card-title">{item.TaskName}</h3>
-//                                 <p>{item.Description}</p>
-//                                 {
-//                                   item.Priority == "Low" ?
-//                                     <>
-//                                       <span className="badge-low">{item.Priority}</span>
-//                                     </>
-//                                     :
-//                                     <>
-//                                       {
-//                                         item.Priority == "Medium" ?
-//                                           <>
-//                                             <span className="badge-medium">{item.Priority}</span>
-//                                           </>
-//                                           :
-//                                           <>
-//                                             {
-//                                               item.Priority == "High" ?
-//                                                 <>
-//                                                   <span className="badge-high">{item.Priority}</span>
-//                                                 </>
-//                                                 :
-//                                                 <></>
-//                                             }
-//                                           </>
-//                                       }
-//                                     </>
-//                                 }
-
-//                               </div>
-//                             </div>
-
-//                           </div>
-//                         </>
-//                         :
-//                         <>
-//                           {
-//                             item.Status == "In Progress" ?
-//                               <>
-//                                 <div className='Status-Kit'>
-//                                   <div className='Status'>
-//                                     <h2 className='InProgress-Title'>In Progress</h2>
-
-//                                     <div className='Inprogress-card Status-wrapper'>
-//                                       <h3 className="card-title">{item.TaskName}</h3>
-//                                       <p>{item.Description}</p>
-//                                       {
-//                                         item.Priority == "Low" ?
-//                                           <>
-//                                             <span className="badge-low">{item.Priority}</span>
-//                                           </>
-//                                           :
-//                                           <>
-//                                             {
-//                                               item.Priority == "Medium" ?
-//                                                 <>
-//                                                   <span className="badge-medium">{item.Priority}</span>
-//                                                 </>
-//                                                 :
-//                                                 <>
-//                                                   {
-//                                                     item.Priority == "High" ?
-//                                                       <>
-//                                                         <span className="badge-high">{item.Priority}</span>
-//                                                       </>
-//                                                       :
-//                                                       <></>
-//                                                   }
-//                                                 </>
-//                                             }
-//                                           </>
-//                                       }
-//                                     </div>
-//                                   </div>
-//                                 </div>
-//                               </>
-//                               :
-//                               <>
-
-//                               </>
-//                           }
-//                         </>
-
-
-
-//                     );
-//                   })
-
-//                 }
-//               </div>
-//             </div>
-// </div>

@@ -109,6 +109,15 @@
     border-radius: 14px;
 }
 
+.Update-Dialog .ms-Dialog-title {
+    text-align: left;
+    color: rgb(121, 89, 165);
+}
+
+.Update-Dialog .ms-Dialog-main {
+    border-radius: 14px;
+}
+
 .Delet-Dialog .ms-Dialog-main {
     border-radius: 16px 16px 16px 16px;
 }
