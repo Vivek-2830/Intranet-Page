@@ -226,7 +226,21 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
         fieldName: "Status",
         minWidth: 150,
         maxWidth: 150,
-        isResizable: false
+        isResizable: false,
+        onRender: (item) => {
+          if(item.Status == "To Do"){
+            return <div className='To-Do'>{item.Status}</div>;
+          }
+          else if(item.Status == "In Progress"){
+            return <div className='In-Progress'>{item.Status}</div>;
+          }
+          else if(item.Status == "Ready For QA"){
+            return <div className='ReadyForQA'>{item.Status}</div>;
+          }
+          else if(item.Status == "Completed") {
+            return <div className='Completed'>{item.Status}</div>;
+          }
+        }
       },
       {
         key: "AssignedTo",

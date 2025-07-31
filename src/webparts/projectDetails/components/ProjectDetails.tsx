@@ -216,7 +216,15 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
         fieldName: "ProjectStatus",
         minWidth: 150,
         maxWidth: 150,
-        isResizable: false
+        isResizable: false,
+        onRender: (item) => {
+          if(item.ProjectStatus == "In Progress"){
+            return <div className='In-Progress'>{item.ProjectStatus}</div>;
+          }
+          else if(item.ProjectStatus == "Completed"){
+            return <div className='Completed'>{item.ProjectStatus}</div>;
+          }
+        }
       },
       {
         key: "AssignedTo",
