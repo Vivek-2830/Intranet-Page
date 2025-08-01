@@ -429,3 +429,37 @@
     font-weight: 600;
     display: inline-block;
 }
+
+.In-Progress {
+    background-color: #fff9c4;
+    color: #b28704;
+    padding: 4px 10px;
+    border-radius: 7px;
+    box-shadow: 0 1px 3px 0 #0000001a, 0 1px 2px -1px #0000001a;
+    font-weight: 600;
+    display: inline-block;
+}
+
+
+#sp-appBar {
+    display: none !important;
+}
+
+.ms-HorizontalNavItems {
+    padding: 0 2px;
+    display: none;
+}
+
+.ms-TooltipHost {
+    display: none;
+}
+[data-automationid="SiteHeaderFollowButton"]{display: none;}
+[data-automationid="ShareSiteButton"]{display: none;}
+[data-automation-id="CanvasZone"]{margin: 0!important;}
+/* [data-automation-id="CanvasZone-SectionContainer"]{max-width: 100% !important;} */
+[data-automation-id="CanvasControl"]{margin: 0px 0!important; padding: 8px 0!important;}
+[data-automation-id="pageHeader"]{display: none;}
+[data-automation-id="CanvasZone"]{padding: 0!important;}
+[data-automation-id="CanvasSection"]{padding: 0!important;}
+#CommentsWrapper{display: none;}
+#spCommandBar{display: none;}

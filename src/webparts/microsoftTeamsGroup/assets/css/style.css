@@ -204,7 +204,45 @@
 
 
 
+.To-Do {
+    padding: 4px 10px;
+    border-radius: 7px;
+    box-shadow: 0 1px 3px 0 #0000001a, 0 1px 2px -1px #0000001a;
+    font-weight: 600;
+    display: inline-block;
+    color: #1e40af;
+    background-color: #dbeafe;
+}
 
+.In-Progress {
+    padding: 4px 10px;
+    border-radius: 7px;
+    box-shadow: 0 1px 3px 0 #0000001a, 0 1px 2px -1px #0000001a;
+    font-weight: 600;
+    display: inline-block;
+    background-color: #fff9c4;
+    color: #b28704;
+}
+
+.ReadyForQA{
+    padding: 4px 10px;
+    border-radius: 7px;
+    box-shadow: 0 1px 3px 0 #0000001a, 0 1px 2px -1px #0000001a;
+    font-weight: 600;
+    display: inline-block;
+    color: #6b21a8;
+    background-color: #f3e8ff;
+}
+
+.Completed {
+    padding: 4px 10px;
+    border-radius: 7px;
+    box-shadow: 0 1px 3px 0 #0000001a, 0 1px 2px -1px #0000001a;
+    font-weight: 600;
+    display: inline-block;
+    background-color: #dcfce7;
+    color: #166534;
+}
 
 .Status-box {
     display: flex;
@@ -247,6 +285,9 @@
     margin: 0px;
     line-height: 1.25rem;
     font-weight: 400;
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .badge-low {
@@ -301,3 +342,27 @@
     -webkit-box-orient: vertical;  
     overflow: hidden;
 }
+
+
+#sp-appBar {
+    display: none !important;
+}
+
+.ms-HorizontalNavItems {
+    padding: 0 2px;
+    display: none;
+}
+
+.ms-TooltipHost {
+    display: none;
+}
+[data-automationid="SiteHeaderFollowButton"]{display: none;}
+[data-automationid="ShareSiteButton"]{display: none;}
+[data-automation-id="CanvasZone"]{margin: 0!important;}
+/* [data-automation-id="CanvasZone-SectionContainer"]{max-width: 100% !important;} */
+[data-automation-id="CanvasControl"]{margin: 0px 0!important; padding: 8px 0!important;}
+[data-automation-id="pageHeader"]{display: none;}
+[data-automation-id="CanvasZone"]{padding: 0!important;}
+[data-automation-id="CanvasSection"]{padding: 0!important;}
+#CommentsWrapper{display: none;}
+#spCommandBar{display: none;}

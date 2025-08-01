@@ -234,11 +234,18 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
         maxWidth: 150,
         isResizable: false,
         onRender: (item) => {
-          return <span>
-            {item.AssignedTo && item.AssignedTo.length > 0
-              ? item.AssignedTo.map(member => member.Title).join(', ')
-              : ''}
-          </span>;
+          return (
+            <span 
+              style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }} 
+              title={item.AssignedTo && item.AssignedTo.length > 0 
+                ? item.AssignedTo.map(member => member.Title).join(', ') 
+                : ''}
+            >
+              {item.AssignedTo && item.AssignedTo.length > 0
+                ? item.AssignedTo.map(member => member.Title).join(', ')
+                : ''}
+            </span> 
+          );
         }
       },
       {
@@ -787,6 +794,7 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
   public async componentDidMount() {
     this.GetProjectDetails();
     this.GetProjectDetailsItem();
+    this.HideNavigation();
   }
 
   public async GetProjectDetails() {
@@ -1052,6 +1060,38 @@ export default class ProjectDetails extends React.Component<IProjectDetailsProps
         }
       }
     });
+  }
+
+  public async HideNavigation() {
+
+    try {
+      // Get current user's groups
+      const userGroups = await sp.web.currentUser.groups();
+
+      // Check if the user is in the Owners or Admins group
+      const isAdmin = userGroups.some(group =>
+        group.Title.indexOf("Owners") !== -1
+        ||
+        group.Title.indexOf("Admins") !== -1
+      );
+
+      if (!isAdmin) {
+        // Hide the navigation bar for non-admins
+        const navBar = document.querySelector("#SuiteNavWrapper");
+        if (navBar) {
+          navBar.setAttribute("style", "display: none;");
+        }
+      } else {
+        // Show the navigation bar for admins
+        const navBar = document.querySelector("#SuiteNavWrapper");
+        if (navBar) {
+          navBar.setAttribute("style", "display: block;");
+        }
+      }
+    } catch (error) {
+      console.error("Error checking user permissions: ", error);
+    }
+
   }
 
 }

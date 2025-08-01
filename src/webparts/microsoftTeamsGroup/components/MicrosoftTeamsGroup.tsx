@@ -256,26 +256,6 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
               : ''}
           </span>;
         }
-        // {item.AssignedTo.Title || ''}
-        //  onRender: (item) => {
-        //   return (
-        //     <span>
-        //       {Array.isArray(item.AssignedTo) ? (
-        //         item.AssignedTo.map((member, index) => (
-        //           <div key={index}>
-        //             <p>{member.Title}</p>
-        //           </div>
-        //         ))
-        //       ) : item.AssignedTo ? (
-        //         <div>
-        //           <p>{item.AssignedTo.Title}</p>
-        //         </div>
-        //       ) : (
-        //         ""
-        //       )}
-        //     </span>
-        //   );
-        // }
       },
       {
         key: "Actions",
@@ -338,7 +318,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
                             <>
                               <div className='Inprogress-card' key={item.ID}>
                                 <h3 className="card-title">{item.TaskName}</h3>
-                                <p>{item.Description}</p>
+                                <p title={item.Description}>{item.Description}</p>                           
                                 {
                                   item.Priority == "Low" ?
                                     <>
@@ -385,7 +365,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
                             <>
                               <div className='Inprogress-card' key={item.ID}>
                                 <h3 className="card-title">{item.TaskName}</h3>
-                                <p>{item.Description}</p>
+                                <p title={item.Description}>{item.Description}</p>  
                                 {
                                   item.Priority == "Low" ?
                                     <>
@@ -432,7 +412,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
                             <>
                               <div className='Inprogress-card' key={item.ID}>
                                 <h3 className="card-title">{item.TaskName}</h3>
-                                <p>{item.Description}</p>
+                                <p title={item.Description}>{item.Description}</p>  
                                 {
                                   item.Priority == "Low" ?
                                     <>
@@ -479,7 +459,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
                             <>
                               <div className='Inprogress-card' key={item.ID}>
                                 <h3 className="card-title">{item.TaskName}</h3>
-                                <p>{item.Description}</p>
+                                <p title={item.Description}>{item.Description}</p>  
                                 {
                                   item.Priority == "Low" ?
                                     <>
@@ -1066,6 +1046,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
   public async componentDidMount() {
     this.GetTaskdetailsStatusItems();
     this.GetTaskDetails();
+    this.HideNavigation();
   }
 
   public async GetTaskDetails() {
@@ -1165,6 +1146,7 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
         StartDate: this.state.StartDate,
         EndDate: this.state.EndDate,
         Status: this.state.Status,
+        Priority : this.state.Priority,
         ProjectNameId: this.state.ProjectNameID,
         ProjectManagerId: this.state.ProjectManagerID,
         AssignedToId: { results: this.state.AssignedToID },
@@ -1353,4 +1335,37 @@ export default class MicrosoftTeamsGroup extends React.Component<IMicrosoftTeams
       console.log(error);
     }
   }
+
+  public async HideNavigation() {
+
+    try {
+      // Get current user's groups
+      const userGroups = await sp.web.currentUser.groups();
+
+      // Check if the user is in the Owners or Admins group
+      const isAdmin = userGroups.some(group =>
+        group.Title.indexOf("Owners") !== -1
+        ||
+        group.Title.indexOf("Admins") !== -1
+      );
+
+      if (!isAdmin) {
+        // Hide the navigation bar for non-admins
+        const navBar = document.querySelector("#SuiteNavWrapper");
+        if (navBar) {
+          navBar.setAttribute("style", "display: none;");
+        }
+      } else {
+        // Show the navigation bar for admins
+        const navBar = document.querySelector("#SuiteNavWrapper");
+        if (navBar) {
+          navBar.setAttribute("style", "display: block;");
+        }
+      }
+    } catch (error) {
+      console.error("Error checking user permissions: ", error);
+    }
+
+  }
+
 }

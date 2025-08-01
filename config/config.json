@@ -57,6 +57,14 @@
           "manifest": "./src/webparts/projectDetails/ProjectDetailsWebPart.manifest.json"
         }
       ]
+    },
+    "task-bug-status-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/taskBugStatus/TaskBugStatusWebPart.js",
+          "manifest": "./src/webparts/taskBugStatus/TaskBugStatusWebPart.manifest.json"
+        }
+      ]
     }
   },
   "externals": {},
@@ -68,6 +76,7 @@
     "SharePointDirectoryWebPartStrings": "lib/webparts/sharePointDirectory/loc/{locale}.js",
     "MicrosoftTeamsGroupWebPartStrings": "lib/webparts/microsoftTeamsGroup/loc/{locale}.js",
     "ControlStrings": "node_modules/@pnp/spfx-controls-react/lib/loc/{locale}.js",
-    "ProjectDetailsWebPartStrings": "lib/webparts/projectDetails/loc/{locale}.js"
+    "ProjectDetailsWebPartStrings": "lib/webparts/projectDetails/loc/{locale}.js",
+    "TaskBugStatusWebPartStrings": "lib/webparts/taskBugStatus/loc/{locale}.js"
   }
 }
